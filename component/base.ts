@@ -1,4 +1,12 @@
+export type BaseTypes = {
+  params?: string[]
+  render(): any
+  afterRender(): void
+  create(): Element
+}
+
 const BaseComponent = class {
+  params?: string[]
   buildingValues: object
   stateInit: boolean
   _state: {

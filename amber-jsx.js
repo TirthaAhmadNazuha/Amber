@@ -47,7 +47,9 @@ const AmberJsx = {
         }
         element.insertAdjacentElement('beforeend', child[0])
       } else if (typeof child === 'function' && child()?.val !== undefined) {
-        element.insertAdjacentText('beforeend', child().val)
+        if (child().val instanceof HTMLElement) {
+          element.insertAdjacentElement('beforeend', child().val)
+        } else element.insertAdjacentText('beforeend', child().val)
         if (usedState[child().key]?.useBy?.length > 0) {
           usedState[child().key].useBy.push({
             element: element.childNodes[index],

@@ -1,37 +1,43 @@
 import BaseComponent from './base'
-import AmberJsx from '../amber-jsx'
+
+export type SyncTypes = {
+  dataLoaded: any
+  afterLoadingShow?: VoidFunction
+  render(): any
+  afterRender(): void
+  create(): Element
+  loader(): Promise<any>
+  loadingElement(): any
+  errorElement(): any
+}
 
 const SyncComponent = class extends BaseComponent {
   dataLoaded: any
+  afterLoadingShow?: VoidFunction
 
   constructor({ buildingValues }) {
     super({ buildingValues })
   }
 
-  loaderData() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(true)
-      }, 3000)
-    })
-  }
+  async loader(): Promise<any> { }
 
-  loading() {
+  loadingElement() {
     const e = document.createElement('h2')
     e.innerText = 'Loading...'
     return [e]
   }
 
-  error(err: string) {
+  errorElement(err: string) {
     return
   }
 
   create() {
     const elem = document.createElement('div')
-    elem.insertAdjacentElement('beforeend', this.loading()[0])
+    elem.insertAdjacentElement('beforeend', this.loadingElement()[0])
     setTimeout(async () => {
+      if (typeof this.afterLoadingShow === 'function') this.afterLoadingShow()
       try {
-        const dataLoaded = await this.loaderData()
+        const dataLoaded = await this.loader()
         this.dataLoaded = dataLoaded
         const r = this.render()
         elem.outerHTML = r[0].outerHTML
@@ -39,7 +45,7 @@ const SyncComponent = class extends BaseComponent {
         this.element = elem
         this.afterRender()
       } catch (err) {
-        elem.innerHTML = this.error(err)[0].outerHTML
+        elem.innerHTML = this.errorElement(err)[0].outerHTML
       }
     })
     return elem
