@@ -1,53 +1,53 @@
 const AmberJsx = {
 
   /**
-   * 
-   * @param {string} tag 
-   * @param {object} attr 
-   * @param  {...HTMLElement} child 
+   *
+   * @param {string} tag
+   * @param {object} attr
+   * @param  {...HTMLElement} child
    */
-  createElement(tag, attr, ...childs) {
-    const element = document.createElement(tag);
-    let usedState = {};
+  createElement (tag, attr, ...childs) {
+    const element = document.createElement(tag)
+    const usedState = {}
     if (attr !== null) {
       Object.keys(attr).forEach((key) => {
         if (attr[key] instanceof Object) {
           Object.keys(attr[key]).forEach((property) => {
             if (typeof attr[key][property] === 'function') {
-              element[key][property] = attr[key][property]().val;
+              element[key][property] = attr[key][property]().val
               if (usedState[property]?.useBy?.length > 0) {
-                usedState[property].useBy.push({ element, pos: `attr.${key}.${property}` });
+                usedState[property].useBy.push({ element, pos: `attr.${key}.${property}` })
               } else {
                 usedState[property] = {
                   useBy: [
-                    { element, pos: `${key}.${property}`, }
+                    { element, pos: `${key}.${property}` }
                   ]
-                };
+                }
               }
-            } else element[key][property] = attr[key][property];
-          });
+            } else element[key][property] = attr[key][property]
+          })
         } else {
-          element.setAttribute(key, attr[key]);
+          element.setAttribute(key, attr[key])
         }
-      });
+      })
     }
     childs.forEach((child, index) => {
       if (child[0] instanceof HTMLElement) {
-        const childState = Object.keys(child[1]);
+        const childState = Object.keys(child[1])
         if (childState.length > 0) {
           childState.forEach((cstate) => {
-            if (usedState.hasOwnProperty(cstate)) {
+            if (usedState[cstate]) {
               child[1][cstate].useBy.forEach((use) => {
-                usedState[cstate].useBy.push(use);
-              });
+                usedState[cstate].useBy.push(use)
+              })
             } else {
-              usedState[cstate] = child[1][cstate];
+              usedState[cstate] = child[1][cstate]
             }
-          });
+          })
         }
-        element.insertAdjacentElement('beforeend', child[0]);
+        element.insertAdjacentElement('beforeend', child[0])
       } else if (typeof child === 'function' && child()?.val !== undefined) {
-        element.insertAdjacentText('beforeend', child().val);
+        element.insertAdjacentText('beforeend', child().val)
         if (usedState[child().key]?.useBy?.length > 0) {
           usedState[child().key].useBy.push({
             element: element.childNodes[index],
@@ -55,7 +55,7 @@ const AmberJsx = {
               parent: element,
               index
             }
-          });
+          })
         } else {
           usedState[child().key] = {
             useBy: [
@@ -67,14 +67,14 @@ const AmberJsx = {
                 }
               }
             ]
-          };
+          }
         }
       } else {
-        element.insertAdjacentText('beforeend', child);
+        element.insertAdjacentText('beforeend', child)
       }
-    });
-    return [element, usedState];
+    })
+    return [element, usedState]
   }
-};
+}
 
-export default AmberJsx;
+export default AmberJsx
