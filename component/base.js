@@ -22,9 +22,9 @@ const BaseComponent = class {
             const realElements = this.element.querySelectorAll(`${user.pos.parent.localName}`);
 
             realElements.forEach((realElement) => {
-
               let isText = realElement.childNodes[user.pos.index].textContent;
-              if ((Number(isText) || isText) === this._state[newStateKey]().val) {
+              if (Number(isText) !== NaN) isText = parseInt(isText);
+              if (isText === this._state[newStateKey]().val) {
                 realElement.childNodes[user.pos.index].textContent = states[newStateKey];
               }
             });
