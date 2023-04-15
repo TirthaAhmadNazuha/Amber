@@ -13,4 +13,5 @@ declare module 'amber' {
   declare AmberJsx
   declare BaseComponent
   declare StateComponent
+  export function getArrayLength(arr: any[]): number;
 }
