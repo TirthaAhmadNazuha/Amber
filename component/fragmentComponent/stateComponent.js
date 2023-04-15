@@ -99,9 +99,8 @@ const stateTask = {
   }
 };
 const StateComponent = class extends BaseComponent {
-  constructor(prop) {
-    super(prop);
-    /** @type {{[K: string]: (State|ArrayState)}} */
+  constructor(prop, childs) {
+    super(prop, childs);
     this.state;
   }
 
