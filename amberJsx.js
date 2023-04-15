@@ -55,9 +55,7 @@ const tasks = [
             apiKey: 'AttributeState',
             arg: [key, element]
           });
-          console.log(attr[key]);
         } else if (attr[key] instanceof Array) {
-          console.log('array', attr[key], key);
           SetAttribute.array(attr[key], key);
         } else if (typeof attr[key] === 'function') {
           SetAttribute.function(attr[key], key);
