@@ -21,7 +21,6 @@ const BaseComponent = class {
 
   isConneted() { }
 
-  /** @returns {HTMLElement} */
   create() {
     const parent = document.createElement('div', { is: componentElement });
     const elem = this._elem || this.render();
