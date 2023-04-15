@@ -1,60 +1,48 @@
+import componentElement from './fragmentComponent/component-element';
+
 const BaseComponent = class {
-  constructor(buildingValues) {
-    this.buildingValues = buildingValues || {};
-    this.stateInit = true;
-    this._state = {};
+  /** @param {Object<string, any>} props */
+  constructor(props, childs) {
+    this.props = props || {};
+    this.childs = childs || [];
+    /** @type {HTMLElement & { usedState: { [key: string]: {parent: () => HTMLElement, elem: () => HTMLElement, prop: any[]} } }} */
+    this.element;
   }
+  /** @returns {AmberJsx.createElement} */
   render() { }
-
-  set state(states) {
-    if (!this.stateInit) {
-      Object.keys(states).forEach((newStateKey) => {
-        this.usedState[newStateKey].useBy.forEach((user) => {
-          if (typeof user.pos === 'string') {
-            const posSplited = user.pos.split('.');
-            const realElements = this.element.querySelectorAll(user.element.localName);
-            realElements.forEach((realElement) => {
-              if (realElement[posSplited[0]][posSplited[1]] === this._state[newStateKey]().val) {
-                realElement[posSplited[0]][posSplited[1]] = states[newStateKey];
-              }
-            });
-          } else {
-            const realElements = this.element.querySelectorAll(`${user.pos.parent.localName}`);
-
-            realElements.forEach((realElement) => {
-              let isText = realElement.childNodes[user.pos.index].textContent;
-              if (Number(isText) !== NaN) isText = parseInt(isText);
-              if (isText === this._state[newStateKey]().val) {
-                realElement.childNodes[user.pos.index].textContent = states[newStateKey];
-              }
-            });
-          }
-        });
-      });
-    }
-    Object.keys(states).forEach((stateKey) => {
-      this._state[stateKey] = () => {
-        return { val: states[stateKey], key: stateKey };
-      };
-    });
-    this.stateInit = false;
+  /**
+   * Move process AmberJsx.createElement to the call.
+   * Use for reduce TMB but move to overload
+   * @description Must call before create()
+  */
+  processJSX() {
+    this._elem = this.render();
   }
 
-  get state() {
-    return this._state;
-  }
+  isConneted() { }
 
-  afterRender() { }
-
+  /** @returns {HTMLElement} */
   create() {
-    const r = this.render();
-    const elem = r[0];
-    this.usedState = r[1];
-    setTimeout(() => {
+    const parent = document.createElement('div', { is: componentElement });
+    const elem = this._elem || this.render();
+    parent.onConnected = () => {
+      if (elem instanceof Array) {
+        elem.forEach((child) => {
+          if (child instanceof HTMLElement) {
+            parent.insertAdjacentElement('beforebegin', child);
+          } else {
+            parent.insertAdjacentText('beforebegin', child);
+          }
+          this.element = parent.parentElement;
+        });
+      } else if (elem instanceof HTMLElement) {
+        parent.insertAdjacentElement('beforebegin', elem);
+      } else parent.insertAdjacentText('beforebegin', elem);
       this.element = elem;
-      this.afterRender();
-    });
-    return elem;
+      this.isConneted();
+      parent.remove();
+    };
+    return parent;
   }
 };
 

@@ -1,5 +1,11 @@
-import AmberJsx from './amber-jsx';
+import AmberJsx from './amberJsx';
 import BaseComponent from './component/base';
-import SyncComponent from './component/async';
+import StateComponent from './component/fragmentComponent/stateComponent';
 
-export { BaseComponent, SyncComponent, AmberJsx as default };
+const Amber = {
+  AmberJsx,
+  BaseComponent,
+  StateComponent,
+};
+
+export { BaseComponent, StateComponent, AmberJsx, Amber as default };
