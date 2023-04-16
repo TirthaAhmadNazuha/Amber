@@ -5,17 +5,29 @@ declare class BaseComponent {
   isConneted(): void;
   create(): HTMLElement;
 }
-var keyStates = []
+
+type State = {
+  key: any;
+  get val(): any;
+}
+
+type ArrayState = {
+  key: any;
+  get val(): any;
+  set val(state: any);
+  add(...items: any): void;
+  remove(target: any): void;
+  preAdd(...items: any): void;
+  removeLast(): void;
+  get length(): State;
+}
+
 type state = {
-  [keyStates]: object;
+  [K: string]: (State | ArrayState),
 }
 declare class StateComponent extends BaseComponent {
   state: state;
-  makeStates(states: object): void {
-    Object.keys(states).forEach((key) => {
-      keyStates.push(keyStates)
-    })
-  };
+  makeStates(states: object): void;
   setState(states: object): void;
 }
 export = {
