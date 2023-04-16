@@ -1,20 +1,13 @@
 import componentElement from './fragmentComponent/component-element';
 
 const BaseComponent = class {
-  /** @param {Object<string, any>} props */
   constructor(props, childs) {
     this.props = props || {};
     this.childs = childs || [];
     /** @type {HTMLElement & { usedState: { [key: string]: {parent: () => HTMLElement, elem: () => HTMLElement, prop: any[]} } }} */
     this.element;
   }
-  /** @returns {AmberJsx.createElement} */
   render() { }
-  /**
-   * Move process AmberJsx.createElement to the call.
-   * Use for reduce TMB but move to overload
-   * @description Must call before create()
-  */
   processJSX() {
     this._elem = this.render();
   }

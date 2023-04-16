@@ -5,12 +5,17 @@ declare class BaseComponent {
   isConneted(): void;
   create(): HTMLElement;
 }
+var keyStates = []
 type state = {
-  [K: string]: object;
+  [keyStates]: object;
 }
 declare class StateComponent extends BaseComponent {
   state: state;
-  makeStates(states: object): void;
+  makeStates(states: object): void {
+    Object.keys(states).forEach((key) => {
+      keyStates.push(keyStates)
+    })
+  };
   setState(states: object): void;
 }
 export = {
