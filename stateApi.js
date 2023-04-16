@@ -2,6 +2,7 @@ const ElementChild = (newState, isState) => {
   isState.state.insertAdjacentElement('afterend', newState);
   isState.state.remove();
   isState.state = newState;
+  isState._val = newState;
 };
 
 const ArrayChild = (newState, isState, element) => {
@@ -32,11 +33,13 @@ const ArrayChild = (newState, isState, element) => {
       }
     });
     isState.state = childNew;
+    isState._val = childNew;
   }
 };
 
 const TextChild = (newState, isState) => {
   isState.state.data = newState;
+  isState._val = newState;
 };
 
 export const SetAttribute = {
@@ -82,6 +85,7 @@ const AttributeState = (value, state, key, element) => {
     SetAttribute.any(value, key);
   }
   state.state = value;
+  state._val = value;
 };
 
 const stateApi = {

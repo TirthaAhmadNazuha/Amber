@@ -8,13 +8,15 @@ export const State = class {
     this.key = key;
     this.users = [];
     this.settedCallback = this.settedCallback.bind(this);
+    /** @private */
+    this._val = state;
   }
   set val(state) {
-    this.state = state;
-    this.settedCallback();
+    this._val = state;
+    stateTask.setStateMethod(state, this);
   }
   get val() {
-    return this.state;
+    return this._val;
   }
   settedCallback() { }
   setUser(descriptionState) {
