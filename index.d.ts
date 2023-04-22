@@ -1,9 +1,12 @@
 declare class BaseComponent {
-  constructor(props: object, childs?: Array);
+  constructor(props: Object, childs?: Array);
   render(): HTMLElement;
   processJSX(): void;
   isConneted(): void;
   create(): HTMLElement;
+  element: HTMLElement;
+  props: Object;
+  childs: Array;
 }
 
 type State = {
@@ -27,8 +30,8 @@ type state = {
 }
 declare class StateComponent extends BaseComponent {
   state: state;
-  makeStates(states: object): void;
-  setState(states: object): void;
+  makeStates(states: Object): void;
+  setState(states: Object): void;
 }
 export = {
   BaseComponent,

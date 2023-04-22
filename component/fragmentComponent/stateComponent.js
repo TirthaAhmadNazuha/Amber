@@ -71,7 +71,7 @@ const ArrayState = class extends State {
   }
   settedCallback() {
     if (this.lengthState === undefined) return;
-    stateTask.setStateMethod({ [this.lengthState.key]: this.state.length }, this.lengthState.key, { [this.lengthState.key]: this.lengthState });
+    stateTask.setStateMethod({ [this.lengthState.key]: this.state.length }, { [this.lengthState.key]: this.lengthState });
   }
   get length() {
     this.lengthState = new State(this.state.length, this.key + '_length');
@@ -80,8 +80,11 @@ const ArrayState = class extends State {
 };
 
 const stateTask = {
-  setInState(states) {
+  setInState(states, isState = null) {
     let state = {};
+    if (isState) {
+      state = isState;
+    }
     Object.keys(states).forEach((key) => {
       if (states[key] instanceof Array) {
         state[key] = new ArrayState(states[key], key);
@@ -95,7 +98,7 @@ const stateTask = {
   setStateMethod(newStates, isState) {
     Object.keys(newStates).forEach((keyState) => {
       isState[keyState].users.forEach((user) => {
-        stateApi[user.apiKey](newStates[keyState], isState[keyState], ...(user.arg || []));
+        stateApi[user.apiKey](newStates[keyState], isState[keyState], user);
       });
     });
   }
@@ -110,7 +113,7 @@ const StateComponent = class extends BaseComponent {
     if (!states instanceof Object) {
       throw new Error('state must be an object');
     }
-    this.state = stateTask.setInState(states);
+    this.state = stateTask.setInState(states, this.state);
   }
 
   setState(newStates) {

@@ -1,75 +1,70 @@
-const ElementChild = (newState, isState) => {
-  isState.state.insertAdjacentElement('afterend', newState);
-  isState.state.remove();
+import { BaseComponent } from '.';
+
+const ElementChild = (newState, isState, user) => {
+  user.element.replaceWith(newState);
   isState.state = newState;
   isState._val = newState;
 };
 
-const ArrayChild = (newState, isState, element) => {
-  const childElem = isState.state.find((child) => child instanceof HTMLElement);
-  if (newState instanceof Array) {
-    const childNew = [];
-    newState.forEach((newChild) => {
-      if (childElem) {
-        if (typeof newChild === 'string') {
-          childElem.insertAdjacentText('beforebegin', newChild);
-        } else {
-          childElem.insertAdjacentElement('beforebegin', newChild);
-        }
-      } else element.append(newChild);
-      childNew.push(newChild);
-    });
-    let childsText = [];
-    element.childNodes.forEach((child) => {
-      if (child instanceof Text) {
-        childsText.push(child);
+/** @param {{parent: HTMLElement, element: (Element|Text)}} user */
+const ArrayChild = (newState, isState, user) => {
+  user.parent.replaceChildren();
+  let preState = [];
+  newState.forEach((newItem) => {
+    if (newItem instanceof BaseComponent) {
+      user.parent.append(newItem.create());
+      if (newItem instanceof Array) {
+        preState.push(...newItem.element);
+      } else {
+        preState.push(newItem.element);
       }
-    });
-    isState.state.forEach((child) => {
-      try {
-        child.remove();
-      } catch (err) {
-        childsText.find((c) => c.data === child).remove();
-      }
-    });
-    isState.state = childNew;
-    isState._val = childNew;
-  }
+    } else if (typeof newItem === 'function') {
+      const elem = newItem();
+      user.parent.append(elem);
+      preState.push(elem);
+    } else {
+      preState.push(newItem);
+      user.parent.append(newItem);
+    }
+  });
+  isState.state = preState;
+  isState._val = preState;
+  isState.settedCallback();
 };
 
-const TextChild = (newState, isState) => {
-  isState.state.data = newState;
+const TextChild = (newState, isState, user) => {
+  user.element.data = newState;
+  isState.state = newState;
   isState._val = newState;
 };
 
 export const SetAttribute = {
-  element: null,
-  object(value, key) {
+  object(value, key, elem) {
     Object.keys(value).forEach((property) => {
       try {
-        this.element[key][property] = value[property];
+        elem[key][property] = value[property];
       } catch (err) {
-        this.element[key] = {};
-        this.element[key][property] = value[property];
+        elem[key] = {};
+        elem[key][property] = value[property];
       }
     });
   },
-  array(value, key) {
+  array(value, key, elem) {
     let isString = value.filter((val) => typeof val === 'string').length === value.length;
     if (isString) {
-      this.any(value.toString().replaceAll(',', ' '), key);
+      this.any(value.toString().replaceAll(',', ' '), key, elem);
     } else {
-      this.element[key] = value;
+      elem[key] = value;
     }
   },
-  function(value, key) {
+  function(value, key, elem) {
     if (key.startsWith('on') && key.charAt(2).toUpperCase() === key.charAt(2)) {
-      this.element.addEventListener(key.slice(2).toLowerCase(), (e) => value(e, this.element));
+      elem.addEventListener(key.slice(2).toLowerCase(), (e) => value(e, elem));
     }
   },
-  any(value, key) {
+  any(value, key, elem) {
     key = key === 'className' ? 'class' : key;
-    this.element.setAttribute(key, value);
+    elem.setAttribute(key, value);
   }
 };
 

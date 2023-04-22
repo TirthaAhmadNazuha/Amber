@@ -4,8 +4,6 @@ const BaseComponent = class {
   constructor(props, childs) {
     this.props = props || {};
     this.childs = childs || [];
-    /** @type {HTMLElement & { usedState: { [key: string]: {parent: () => HTMLElement, elem: () => HTMLElement, prop: any[]} } }} */
-    this.element;
   }
   render() { }
   processJSX() {
