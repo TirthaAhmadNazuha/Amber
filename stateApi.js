@@ -171,6 +171,10 @@ export const SetAttribute = {
   function(value, key, elem) {
     if (key.startsWith('on') && key.charAt(2).toUpperCase() === key.charAt(2)) {
       elem.addEventListener(key.slice(2).toLowerCase(), (e) => value(e, elem));
+    } else if (key === 'then') {
+      value(elem);
+    } else {
+      elem.key = value();
     }
   },
   any(value, key, elem) {
