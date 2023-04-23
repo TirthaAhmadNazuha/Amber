@@ -27,25 +27,25 @@ export const ElementChild = (newState, isState, user) => {
   if (user.element?.elem instanceof Array) {
     if (newState instanceof BaseComponent) {
       try {
-        user.element.elem[0].insertAdjacentElement('beforebegin', new newState().create());
+        user.element.elem[0].replaceWith(new newState().create());
         user.element.elem.forEach((c) => c?.remove());
       } catch (err) {
         try {
-          user.element.elem[0].insertAdjacentElement('beforebegin', newState.create());
+          user.element.elem[0].replaceWith(newState.create());
           user.element.elem.forEach((c) => c?.remove());
         } catch (er) {
-          user.element.elem[0].insertAdjacentElement('beforebegin', newState());
+          user.element.elem[0].replaceWith(newState());
           user.element.elem.forEach((c) => c?.remove());
         }
       }
     } else if (newState instanceof Array) {
-      user.element.elem[0].insertAdjacentElement('beforebegin', ...newState);
+      user.element.elem[0].replaceWith(...newState);
       user.element.elem.forEach((c) => c?.remove());
     } else if (typeof newState === 'function') {
-      user.element.elem[0].insertAdjacentElement('beforebegin', newState());
+      user.element.elem[0].replaceWith(newState());
       user.element.elem.forEach((c) => c?.remove());
     } else {
-      user.element.elem[0].insertAdjacentElement('beforebegin', newState);
+      user.element.elem[0].replaceWith(newState);
       user.element.elem.forEach((c) => c?.remove());
     }
     isState.state = newState;
