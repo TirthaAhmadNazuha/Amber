@@ -31,7 +31,6 @@ const ArrayChild = (newState, isState, user) => {
   });
   isState.state = preState;
   isState.value = preState;
-  isState.settedCallback();
 };
 
 const TextChild = (newState, isState, user) => {

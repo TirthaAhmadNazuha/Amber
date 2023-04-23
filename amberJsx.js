@@ -1,6 +1,6 @@
+/* eslint-disable import/no-cycle */
 import BaseComponent from './component/base';
-// eslint-disable-next-line import/no-cycle
-import { State } from './component/fragmentComponent/stateComponent';
+import State from './component/fragmentComponent/states/state';
 import { SetAttribute } from './stateApi';
 
 const tasks = [

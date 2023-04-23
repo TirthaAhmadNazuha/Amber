@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import BaseComponent from './base';
 import { setInState, setStateMethod } from './fragmentComponent/states/task';
 

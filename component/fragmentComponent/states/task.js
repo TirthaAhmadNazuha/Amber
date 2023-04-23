@@ -1,20 +1,20 @@
 /* eslint-disable import/no-cycle */
 import stateApi from '../../../stateApi';
-import State from './state';
-import ArrayState from './array';
+import State, { ArrayState } from './state';
 
 export const setInState = (states, isState = null) => {
   let state = {};
   if (isState) {
     state = isState;
   }
-  Object.keys(states).forEach((key) => {
+  Object.keys(states).forEach(async (key) => {
     if (states[key] instanceof Array) {
       state[key] = new ArrayState(states[key], key);
     } else {
       state[key] = new State(states[key], key);
     }
   });
+  console.log(state);
   return state;
 };
 
