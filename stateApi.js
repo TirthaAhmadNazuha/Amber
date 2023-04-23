@@ -1,15 +1,78 @@
-/* eslint-disable import/no-cycle */
+/* eslint-disable new-cap */
 /* eslint-disable no-param-reassign */
-import { BaseComponent } from '.';
+import BaseComponent from './component/base';
 
-const ElementChild = (newState, isState, user) => {
-  user.element.replaceWith(newState);
+export const ElementChild = (newState, isState, user) => {
+  if (user.element?.elem instanceof HTMLElement) {
+    if (newState instanceof BaseComponent) {
+      try {
+        user.element.elem.replaceWith(new newState().create());
+      } catch (err) {
+        try {
+          user.element.elem.replaceWith(newState.create());
+        } catch (er) {
+          user.element.elem.replaceWith(newState());
+        }
+      }
+    } else if (newState instanceof Array) {
+      user.element.elem.replaceWith(...newState);
+    } else if (typeof newState === 'function') {
+      user.element.elem.replaceWith(newState());
+    } else {
+      user.element.elem.replaceWith(newState);
+    }
+    isState.state = newState;
+    return;
+  }
+  if (user.element?.elem instanceof Array) {
+    if (newState instanceof BaseComponent) {
+      try {
+        user.element.elem[0].insertAdjacentElement('beforebegin', new newState().create());
+        user.element.elem.forEach((c) => c?.remove());
+      } catch (err) {
+        try {
+          user.element.elem[0].insertAdjacentElement('beforebegin', newState.create());
+          user.element.elem.forEach((c) => c?.remove());
+        } catch (er) {
+          user.element.elem[0].insertAdjacentElement('beforebegin', newState());
+          user.element.elem.forEach((c) => c?.remove());
+        }
+      }
+    } else if (newState instanceof Array) {
+      user.element.elem[0].insertAdjacentElement('beforebegin', ...newState);
+      user.element.elem.forEach((c) => c?.remove());
+    } else if (typeof newState === 'function') {
+      user.element.elem[0].insertAdjacentElement('beforebegin', newState());
+      user.element.elem.forEach((c) => c?.remove());
+    } else {
+      user.element.elem[0].insertAdjacentElement('beforebegin', newState);
+      user.element.elem.forEach((c) => c?.remove());
+    }
+    isState.state = newState;
+    return;
+  }
+  if (newState instanceof BaseComponent) {
+    try {
+      user.element.replaceWith(new newState().create());
+    } catch (err) {
+      try {
+        user.element.replaceWith(newState.create());
+      } catch (er) {
+        user.element.replaceWith(newState());
+      }
+    }
+  } else if (newState instanceof Array) {
+    user.element.replaceWith(...newState);
+  } else if (typeof newState === 'function') {
+    user.element.replaceWith(newState());
+  } else {
+    user.element.replaceWith(newState);
+  }
   isState.state = newState;
-  isState.value = newState;
 };
 
 /** @param {{parent: HTMLElement, element: (Element|Text)}} user */
-const ArrayChild = (newState, isState, user) => {
+export const ArrayChild = (newState, isState, user) => {
   user.parent.replaceChildren();
   const preState = [];
   newState.forEach((newItem) => {
@@ -30,13 +93,11 @@ const ArrayChild = (newState, isState, user) => {
     }
   });
   isState.state = preState;
-  isState.value = preState;
 };
 
-const TextChild = (newState, isState, user) => {
+export const TextChild = (newState, isState, user) => {
   user.element.data = newState;
   isState.state = newState;
-  isState.value = newState;
 };
 
 export const SetAttribute = {
@@ -69,7 +130,7 @@ export const SetAttribute = {
   },
 };
 
-const AttributeState = (value, state, key, element) => {
+export const AttributeState = (value, state, key, element) => {
   SetAttribute.element = element;
   if (value instanceof Array) {
     SetAttribute.array(value, key);
@@ -81,7 +142,6 @@ const AttributeState = (value, state, key, element) => {
     SetAttribute.any(value, key);
   }
   state.state = value;
-  state.value = value;
 };
 
 const stateApi = {

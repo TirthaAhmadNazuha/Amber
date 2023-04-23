@@ -1,31 +1,35 @@
 /* eslint-disable max-classes-per-file */
-/* eslint-disable import/no-cycle */
-import { setStateMethod } from './task';
 
-class State {
+const State = class {
   constructor(state, key) {
     this.state = state;
     this.key = key;
     this.users = [];
-    this.modifyCallback = this.modifyCallback.bind(this);
-    this.value = state;
+    this.changedCallback = this.changedCallback.bind(this);
   }
 
   set val(state) {
-    setStateMethod(state, this);
-    this.modifyCallback();
+    this.users.forEach(async (user) => {
+      const stateApi = (await import('../../../stateApi'));
+      stateApi[user.apiKey](state, this, user);
+    });
+    this.changedCallback();
   }
 
   get val() {
-    return this.value;
+    return this.state;
   }
 
   modifyCallback() { }
 
+  changedCallback() {
+    this.modifyCallback();
+  }
+
   setUser(descriptionState) {
     this.users.push(descriptionState);
   }
-}
+};
 
 export const ArrayState = class extends State {
   add(...items) {
@@ -35,8 +39,7 @@ export const ArrayState = class extends State {
         user.elem().append(item);
       });
     });
-    this.setLengthStates();
-    this.modifyCallback();
+    this.changedCallback();
   }
 
   remove(target) {
@@ -48,8 +51,7 @@ export const ArrayState = class extends State {
         user.elem().children[target].remove();
       } else target.remove();
     });
-    this.setLengthStates();
-    this.modifyCallback();
+    this.changedCallback();
   }
 
   preAdd(...items) {
@@ -57,25 +59,26 @@ export const ArrayState = class extends State {
     this.users.forEach((user) => {
       user.elem().prepend(...items);
     });
-    this.setLengthStates();
-    this.modifyCallback();
+    this.changedCallback();
   }
 
   removeLast() {
     this.remove(this.state[this.state.length - 1]);
-    this.setLengthStates();
+    this.changedCallback();
+  }
+
+  changedCallback() {
+    if (this.lengthState) {
+      this.lengthState.users.forEach(async (user) => {
+        const stateApi = (await import('../../../stateApi'));
+        stateApi[user.apiKey](this.state.length, this.lengthState, user);
+      });
+    }
     this.modifyCallback();
   }
 
-  setLengthStates() {
-    if (this.lengthState === undefined) return;
-    setStateMethod(
-      { [this.lengthState.key]: this.state.length },
-      { [this.lengthState.key]: this.lengthState },
-    );
-  }
-
   get length() {
+    if (this.lengthState) return this.lengthState;
     this.lengthState = new State(this.state.length, `${this.key}_length`);
     return this.lengthState;
   }

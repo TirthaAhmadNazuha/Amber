@@ -17,6 +17,7 @@ const BaseComponent = class {
   create() {
     const parent = document.createElement('div', { is: componentElement });
     const elem = this.elem || this.render();
+    parent.elem = elem;
     parent.onConnected = () => {
       if (elem instanceof Array) {
         elem.forEach((child) => {

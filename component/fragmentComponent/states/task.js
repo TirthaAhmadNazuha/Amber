@@ -14,7 +14,6 @@ export const setInState = (states, isState = null) => {
       state[key] = new State(states[key], key);
     }
   });
-  console.log(state);
   return state;
 };
 
