@@ -12,13 +12,13 @@ export const ElementChild = (newState, isState, user) => {
     } else if (newState instanceof HTMLElement || typeof newState === 'string') {
       isState.state.elem.replaceWith(newState);
     } else if (newState instanceof BaseComponent) {
+      isState.state.elem.replaceWith(newState.create());
+    } else if (typeof newState === 'function') {
       try {
-        isState.state.elem.replaceWith(newState.create());
+        isState.state.elem.replaceWith(newState());
       } catch (_) {
         isState.state.elem.replaceWith(new newState().create());
       }
-    } else if (typeof newState === 'function') {
-      isState.state.elem.replaceWith(newState());
     } else {
       isState.state.elem.replaceWith(newState);
     }
@@ -35,13 +35,13 @@ export const ElementChild = (newState, isState, user) => {
     } else if (newState instanceof HTMLElement || typeof newState === 'string') {
       isState.state.elem[isState.state.elem.length - 1].replaceWith(newState);
     } else if (newState instanceof BaseComponent) {
+      isState.state.elem[isState.state.elem.length - 1].replaceWith(newState.create());
+    } else if (typeof newState === 'function') {
       try {
-        isState.state.elem[isState.state.elem.length - 1].replaceWith(newState.create());
+        isState.state.elem[isState.state.elem.length - 1].replaceWith(newState());
       } catch (_) {
         isState.state.elem[isState.state.elem.length - 1].replaceWith(new newState().create());
       }
-    } else if (typeof newState === 'function') {
-      isState.state.elem[isState.state.elem.length - 1].replaceWith(newState());
     } else {
       isState.state.elem[isState.state.elem.length - 1].replaceWith(newState);
     }
@@ -58,13 +58,13 @@ export const ElementChild = (newState, isState, user) => {
     } else if (newState instanceof HTMLElement || typeof newState === 'string') {
       isState.state.replaceWith(newState);
     } else if (newState instanceof BaseComponent) {
+      isState.state.replaceWith(newState.create());
+    } else if (typeof newState === 'function') {
       try {
-        isState.state.replaceWith(newState.create());
+        isState.state.replaceWith(newState());
       } catch (_) {
         isState.state.replaceWith(new newState().create());
       }
-    } else if (typeof newState === 'function') {
-      isState.state.replaceWith(newState());
     } else {
       isState.state.replaceWith(newState);
     }
@@ -86,17 +86,16 @@ export const ElementChild = (newState, isState, user) => {
     element.replaceWith(newState);
     userToNew.element = newState;
   } else if (newState instanceof BaseComponent) {
-    try {
-      const elem = newState.create();
-      element.replaceWith(elem);
-      userToNew.element = elem;
-    } catch (_) {
-      const elem = new newState().create();
-      element.replaceWith(elem);
-      userToNew.element = elem;
-    }
+    const elem = newState.create();
+    element.replaceWith(elem);
+    userToNew.element = elem;
   } else if (typeof newState === 'function') {
-    const elem = newState();
+    let elem = null;
+    try {
+      elem = newState();
+    } catch (_) {
+      elem = new newState().create();
+    }
     element.replaceWith(elem);
     userToNew.element = elem;
   } else {
@@ -120,7 +119,12 @@ export const ArrayChild = (newState, isState, user) => {
         preState.push(newItem.element);
       }
     } else if (typeof newItem === 'function') {
-      const elem = newItem();
+      let elem = null;
+      try {
+        elem = newItem();
+      } catch (_) {
+        elem = new newItem().create();
+      }
       user.parent.append(elem);
       preState.push(elem);
     } else {
