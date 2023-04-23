@@ -6,20 +6,20 @@ const State = class {
     this.state = state;
     this.key = key;
     this.users = [];
-    this.settedCallback = this.settedCallback.bind(this);
+    this.modifyCallback = this.modifyCallback.bind(this);
     this.value = state;
   }
 
   set val(state) {
     setStateMethod(state, this);
-    this.settedCallback();
+    this.modifyCallback();
   }
 
   get val() {
     return this.value;
   }
 
-  settedCallback() { }
+  modifyCallback() { }
 
   setUser(descriptionState) {
     this.users.push(descriptionState);

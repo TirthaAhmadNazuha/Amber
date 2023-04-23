@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { setStateMethod } from './task';
 import State from './state';
 
@@ -9,7 +10,8 @@ const ArrayState = class extends State {
         user.elem().append(item);
       });
     });
-    this.settedCallback();
+    this.setLengthStates();
+    this.modifyCallback();
   }
 
   remove(target) {
@@ -21,7 +23,8 @@ const ArrayState = class extends State {
         user.elem().children[target].remove();
       } else target.remove();
     });
-    this.settedCallback();
+    this.setLengthStates();
+    this.modifyCallback();
   }
 
   preAdd(...items) {
@@ -29,15 +32,17 @@ const ArrayState = class extends State {
     this.users.forEach((user) => {
       user.elem().prepend(...items);
     });
-    this.settedCallback();
+    this.setLengthStates();
+    this.modifyCallback();
   }
 
   removeLast() {
     this.remove(this.state[this.state.length - 1]);
-    this.settedCallback();
+    this.setLengthStates();
+    this.modifyCallback();
   }
 
-  settedCallback() {
+  setLengthStates() {
     if (this.lengthState === undefined) return;
     setStateMethod(
       { [this.lengthState.key]: this.state.length },
