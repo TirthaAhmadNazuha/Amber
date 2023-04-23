@@ -1,4 +1,5 @@
-import { BaseComponent } from '.';
+import BaseComponent from './component/base';
+// eslint-disable-next-line import/no-cycle
 import { State } from './component/fragmentComponent/stateComponent';
 import { SetAttribute } from './stateApi';
 
@@ -18,7 +19,7 @@ const tasks = [
           child.setUser({
             apiKey: 'ElementChild',
             parent: element,
-            element: child.state
+            element: child.state,
           });
         } else if (child.state instanceof Array) {
           child.state.forEach((state) => {
@@ -39,12 +40,13 @@ const tasks = [
           child.setUser({
             apiKey: 'ArrayChild',
             parent: element,
-            element: child.state
+            element: child.state,
           });
         } else if (typeof child.state === 'function') {
           try {
             element.append(child.state());
           } catch (err) {
+            // eslint-disable-next-line new-cap
             element.append(new child.state().create());
           }
         } else {
@@ -89,10 +91,9 @@ const tasks = [
           }
           attr[key].setUser({
             apiKey: 'AttributeState',
-            arg: [key, element]
+            arg: [key, element],
           });
         } else if (attr[key] instanceof Array) {
-          console.log(attr[key]);
           SetAttribute.array(attr[key], key, element);
         } else if (typeof attr[key] === 'function') {
           SetAttribute.function(attr[key], key, element);
@@ -116,9 +117,10 @@ const AmberJsx = {
       try {
         return tag(attr, childs);
       } catch (err) {
+        // eslint-disable-next-line new-cap
         return new tag(attr, childs).create();
       }
-    };
+    }
     const param = [childs, attr];
     let element = document.createElement(tag);
 
@@ -126,7 +128,7 @@ const AmberJsx = {
       element = task(element, param[i]);
     });
     return element;
-  }
+  },
 };
 
 export default AmberJsx;

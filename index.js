@@ -1,6 +1,7 @@
+/* eslint-disable import/no-cycle */
 import AmberJsx from './amberJsx';
 import BaseComponent from './component/base';
-import StateComponent from './component/fragmentComponent/stateComponent';
+import StateComponent from './component/states';
 
 const Amber = {
   AmberJsx,
@@ -8,4 +9,7 @@ const Amber = {
   StateComponent,
 };
 
-export { BaseComponent, StateComponent, AmberJsx, Amber as default };
+export {
+  // eslint-disable-next-line no-restricted-exports
+  BaseComponent, StateComponent, AmberJsx, Amber as default,
+};

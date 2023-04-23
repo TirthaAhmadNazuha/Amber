@@ -1,15 +1,17 @@
+/* eslint-disable import/no-cycle */
+/* eslint-disable no-param-reassign */
 import { BaseComponent } from '.';
 
 const ElementChild = (newState, isState, user) => {
   user.element.replaceWith(newState);
   isState.state = newState;
-  isState._val = newState;
+  isState.value = newState;
 };
 
 /** @param {{parent: HTMLElement, element: (Element|Text)}} user */
 const ArrayChild = (newState, isState, user) => {
   user.parent.replaceChildren();
-  let preState = [];
+  const preState = [];
   newState.forEach((newItem) => {
     if (newItem instanceof BaseComponent) {
       user.parent.append(newItem.create());
@@ -28,14 +30,14 @@ const ArrayChild = (newState, isState, user) => {
     }
   });
   isState.state = preState;
-  isState._val = preState;
+  isState.value = preState;
   isState.settedCallback();
 };
 
 const TextChild = (newState, isState, user) => {
   user.element.data = newState;
   isState.state = newState;
-  isState._val = newState;
+  isState.value = newState;
 };
 
 export const SetAttribute = {
@@ -50,7 +52,7 @@ export const SetAttribute = {
     });
   },
   array(value, key, elem) {
-    let isString = value.filter((val) => typeof val === 'string').length === value.length;
+    const isString = value.filter((val) => typeof val === 'string').length === value.length;
     if (isString) {
       this.any(value.toString().replaceAll(',', ' '), key, elem);
     } else {
@@ -65,7 +67,7 @@ export const SetAttribute = {
   any(value, key, elem) {
     key = key === 'className' ? 'class' : key;
     elem.setAttribute(key, value);
-  }
+  },
 };
 
 const AttributeState = (value, state, key, element) => {
@@ -80,14 +82,14 @@ const AttributeState = (value, state, key, element) => {
     SetAttribute.any(value, key);
   }
   state.state = value;
-  state._val = value;
+  state.value = value;
 };
 
 const stateApi = {
-  'ElementChild': ElementChild,
-  'ArrayChild': ArrayChild,
-  'TextChild': TextChild,
-  'SetAttribute': SetAttribute,
-  'AttributeState': AttributeState,
+  ElementChild,
+  ArrayChild,
+  TextChild,
+  SetAttribute,
+  AttributeState,
 };
 export default stateApi;

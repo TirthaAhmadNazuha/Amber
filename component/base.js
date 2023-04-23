@@ -5,16 +5,18 @@ const BaseComponent = class {
     this.props = props || {};
     this.childs = childs || [];
   }
+
   render() { }
+
   processJSX() {
-    this._elem = this.render();
+    this.elem = this.render();
   }
 
   isConneted() { }
 
   create() {
     const parent = document.createElement('div', { is: componentElement });
-    const elem = this._elem || this.render();
+    const elem = this.elem || this.render();
     parent.onConnected = () => {
       if (elem instanceof Array) {
         elem.forEach((child) => {
