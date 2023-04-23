@@ -43,12 +43,20 @@ const tasks = [
             element: child.state,
           });
         } else if (typeof child.state === 'function') {
+          let chils = null;
           try {
-            element.append(child.state());
+            chils = child.state();
+            element.append(chils);
           } catch (err) {
             // eslint-disable-next-line new-cap
-            element.append(new child.state().create());
+            chils = new child.state().create();
+            element.append(chils);
           }
+          child.setUser({
+            apiKey: 'ElementChild',
+            parent: element,
+            element: chils,
+          });
         } else {
           let TextChild;
           if (child.state instanceof Text) {

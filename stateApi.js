@@ -3,72 +3,108 @@
 import BaseComponent from './component/base';
 
 export const ElementChild = (newState, isState, user) => {
-  if (user.element?.elem instanceof HTMLElement) {
-    if (newState instanceof BaseComponent) {
+  if (isState.state?.elem instanceof HTMLElement) {
+    if (newState?.elem instanceof HTMLElement) {
+      isState.state.elem.replaceWith(newState.elem);
+    } else if (newState?.elem instanceof Array || newState instanceof Array) {
+      isState.state.elem
+        .replaceWith(...(newState?.elem || newState));
+    } else if (newState instanceof HTMLElement || typeof newState === 'string') {
+      isState.state.elem.replaceWith(newState);
+    } else if (newState instanceof BaseComponent) {
       try {
-        user.element.elem.replaceWith(new newState().create());
-      } catch (err) {
-        try {
-          user.element.elem.replaceWith(newState.create());
-        } catch (er) {
-          user.element.elem.replaceWith(newState());
-        }
+        isState.state.elem.replaceWith(newState.create());
+      } catch (_) {
+        isState.state.elem.replaceWith(new newState().create());
       }
-    } else if (newState instanceof Array) {
-      user.element.elem.replaceWith(...newState);
     } else if (typeof newState === 'function') {
-      user.element.elem.replaceWith(newState());
+      isState.state.elem.replaceWith(newState());
     } else {
-      user.element.elem.replaceWith(newState);
+      isState.state.elem.replaceWith(newState);
     }
     isState.state = newState;
     return;
   }
-  if (user.element?.elem instanceof Array) {
-    if (newState instanceof BaseComponent) {
+
+  if (isState.state?.elem instanceof Array) {
+    if (newState?.elem instanceof HTMLElement) {
+      isState.state.elem[isState.state.elem.length - 1].replaceWith(newState.elem);
+    } else if (newState?.elem instanceof Array || newState instanceof Array) {
+      isState.state.elem[isState.state.elem.length - 1]
+        .replaceWith(...(newState?.elem || newState));
+    } else if (newState instanceof HTMLElement || typeof newState === 'string') {
+      isState.state.elem[isState.state.elem.length - 1].replaceWith(newState);
+    } else if (newState instanceof BaseComponent) {
       try {
-        user.element.elem[0].replaceWith(new newState().create());
-        user.element.elem.forEach((c) => c?.remove());
-      } catch (err) {
-        try {
-          user.element.elem[0].replaceWith(newState.create());
-          user.element.elem.forEach((c) => c?.remove());
-        } catch (er) {
-          user.element.elem[0].replaceWith(newState());
-          user.element.elem.forEach((c) => c?.remove());
-        }
+        isState.state.elem[isState.state.elem.length - 1].replaceWith(newState.create());
+      } catch (_) {
+        isState.state.elem[isState.state.elem.length - 1].replaceWith(new newState().create());
       }
-    } else if (newState instanceof Array) {
-      user.element.elem[0].replaceWith(...newState);
-      user.element.elem.forEach((c) => c?.remove());
     } else if (typeof newState === 'function') {
-      user.element.elem[0].replaceWith(newState());
-      user.element.elem.forEach((c) => c?.remove());
+      isState.state.elem[isState.state.elem.length - 1].replaceWith(newState());
     } else {
-      user.element.elem[0].replaceWith(newState);
-      user.element.elem.forEach((c) => c?.remove());
+      isState.state.elem[isState.state.elem.length - 1].replaceWith(newState);
+    }
+    isState.state.elem.forEach((c) => c?.remove());
+    isState.state = newState;
+    return;
+  }
+  if (isState.state instanceof HTMLElement) {
+    if (newState?.elem instanceof HTMLElement) {
+      isState.state.replaceWith(newState);
+    } else if (newState?.elem instanceof Array || newState instanceof Array) {
+      isState.state
+        .replaceWith(...(newState?.elem || newState));
+    } else if (newState instanceof HTMLElement || typeof newState === 'string') {
+      isState.state.replaceWith(newState);
+    } else if (newState instanceof BaseComponent) {
+      try {
+        isState.state.replaceWith(newState.create());
+      } catch (_) {
+        isState.state.replaceWith(new newState().create());
+      }
+    } else if (typeof newState === 'function') {
+      isState.state.replaceWith(newState());
+    } else {
+      isState.state.replaceWith(newState);
     }
     isState.state = newState;
     return;
   }
-  if (newState instanceof BaseComponent) {
+  const { element } = user;
+  const userToNew = user;
+  if (newState?.elem instanceof HTMLElement) {
+    element.replaceWith(newState.elem);
+    userToNew.element = newState.elem;
+  } else if (newState?.elem instanceof Array || newState instanceof Array) {
+    element
+      .replaceWith(...(newState?.elem || newState));
+    userToNew.element = {
+      elem: newState?.elem || newState,
+    };
+  } else if (newState instanceof HTMLElement || typeof newState === 'string') {
+    element.replaceWith(newState);
+    userToNew.element = newState;
+  } else if (newState instanceof BaseComponent) {
     try {
-      user.element.replaceWith(new newState().create());
-    } catch (err) {
-      try {
-        user.element.replaceWith(newState.create());
-      } catch (er) {
-        user.element.replaceWith(newState());
-      }
+      const elem = newState.create();
+      element.replaceWith(elem);
+      userToNew.element = elem;
+    } catch (_) {
+      const elem = new newState().create();
+      element.replaceWith(elem);
+      userToNew.element = elem;
     }
-  } else if (newState instanceof Array) {
-    user.element.replaceWith(...newState);
   } else if (typeof newState === 'function') {
-    user.element.replaceWith(newState());
+    const elem = newState();
+    element.replaceWith(elem);
+    userToNew.element = elem;
   } else {
-    user.element.replaceWith(newState);
+    element.replaceWith(newState);
+    userToNew.element = newState;
   }
   isState.state = newState;
+  isState.users[isState.users.findIndex((us) => us.element === element)] = userToNew;
 };
 
 /** @param {{parent: HTMLElement, element: (Element|Text)}} user */
