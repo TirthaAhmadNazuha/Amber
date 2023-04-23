@@ -64,7 +64,7 @@ const tasks = [
             child.setUser({
               apiKey: 'TextChild',
               parent: element,
-              element: TextChild,
+              arg: [child.state],
             });
           } else {
             TextChild = document.createTextNode(child.state);
@@ -73,7 +73,7 @@ const tasks = [
           child.setUser({
             apiKey: 'TextChild',
             parent: element,
-            element: TextChild,
+            arg: [TextChild],
           });
         }
       } else {

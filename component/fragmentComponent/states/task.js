@@ -20,7 +20,7 @@ export const setInState = (states, isState = null) => {
 export const setStateMethod = (newStates, isState) => {
   Object.keys(newStates).forEach((keyState) => {
     isState[keyState].users.forEach((user) => {
-      stateApi[user.apiKey](newStates[keyState], isState[keyState], user);
+      stateApi[user.apiKey](newStates[keyState], isState[keyState], user, ...(user?.arg || []));
     });
   });
 };

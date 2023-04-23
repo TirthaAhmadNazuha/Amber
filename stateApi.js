@@ -1,6 +1,7 @@
 /* eslint-disable new-cap */
 /* eslint-disable no-param-reassign */
 import BaseComponent from './component/base';
+import State from './component/fragmentComponent/states/state';
 
 export const ElementChild = (newState, isState, user) => {
   if (isState.state?.elem instanceof HTMLElement) {
@@ -135,8 +136,8 @@ export const ArrayChild = (newState, isState, user) => {
   isState.state = preState;
 };
 
-export const TextChild = (newState, isState, user) => {
-  user.element.data = newState;
+export const TextChild = (newState, isState, _, element) => {
+  element.data = newState;
   isState.state = newState;
 };
 
@@ -144,7 +145,15 @@ export const SetAttribute = {
   object(value, key, elem) {
     Object.keys(value).forEach((property) => {
       try {
-        elem[key][property] = value[property];
+        if (value[property] instanceof State) {
+          elem[key][property] = value[property].val;
+          value[property].setUser({
+            apiKey: 'AttributeStateObject',
+            arg: [key, elem, property],
+          });
+        } else {
+          elem[key][property] = value[property];
+        }
       } catch (err) {
         elem[key] = {};
         elem[key][property] = value[property];
@@ -170,7 +179,7 @@ export const SetAttribute = {
   },
 };
 
-export const AttributeState = (value, state, key, element) => {
+export const AttributeState = (value, state, _, key, element) => {
   SetAttribute.element = element;
   if (value instanceof Array) {
     SetAttribute.array(value, key);
@@ -184,11 +193,17 @@ export const AttributeState = (value, state, key, element) => {
   state.state = value;
 };
 
+const AttributeStateObject = (value, state, _, key, element, property) => {
+  element[key][property] = value;
+  state.state = value;
+};
+
 const stateApi = {
   ElementChild,
   ArrayChild,
   TextChild,
   SetAttribute,
   AttributeState,
+  AttributeStateObject,
 };
 export default stateApi;
