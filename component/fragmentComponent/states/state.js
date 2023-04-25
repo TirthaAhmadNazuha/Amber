@@ -1,5 +1,7 @@
 /* eslint-disable max-classes-per-file */
 
+import typeChecker from '../../../typeChecker';
+
 const State = class {
   constructor(state, key) {
     this.state = state;
@@ -17,7 +19,7 @@ const State = class {
   }
 
   get val() {
-    return this.state;
+    return this.value || this.state;
   }
 
   modifyCallback() { }
@@ -34,30 +36,45 @@ const State = class {
 export const ArrayState = class extends State {
   add(...items) {
     items.forEach((item) => {
-      this.state.push(item);
       this.users.forEach((user) => {
-        user.elem().append(item);
+        const itemResult = typeChecker(item);
+        user.element[user.element.length - 1]
+          ?.replaceWith(user.element[user.element.length - 1], itemResult);
+        this.state.push(itemResult);
+        this.value.push(item);
       });
     });
     this.changedCallback();
   }
 
   remove(target) {
+    this.users.forEach((user) => {
+      if (user.element.length === 1) {
+        const semitext = document.createTextNode('');
+        user.element[0].replaceWith(user.element[0], semitext);
+        user.element.push(semitext);
+      }
+      if (typeof target === 'number') {
+        user.element[target].remove();
+      } else {
+        target.remove();
+      }
+    });
     if (typeof target === 'number') {
       this.state.splice(target, 1);
     } else this.state.splice(this.state.indexOf(target), 1);
-    this.users.forEach((user) => {
-      if (typeof target === 'number') {
-        user.elem().children[target].remove();
-      } else target.remove();
-    });
     this.changedCallback();
   }
 
   preAdd(...items) {
-    this.state.unshift(...items);
-    this.users.forEach((user) => {
-      user.elem().prepend(...items);
+    items.forEach((item) => {
+      this.users.forEach((user) => {
+        const itemResult = typeChecker(item);
+        user.element[0]
+          ?.replaceWith(itemResult, user.element[0]);
+        this.state.unshift(itemResult);
+        this.value.unshift(item);
+      });
     });
     this.changedCallback();
   }

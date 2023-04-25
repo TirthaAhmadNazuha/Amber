@@ -1,84 +1,13 @@
-/* eslint-disable import/no-cycle */
-import BaseComponent from './component/base';
+import { BaseComponent } from '.';
 import State from './component/fragmentComponent/states/state';
 import { SetAttribute } from './stateApi';
+import typeChecker from './typeChecker';
 
 const tasks = [
   (element, childs) => {
     childs.forEach((child) => {
-      if (child === undefined) return;
-      if (child instanceof HTMLElement) {
-        element.append(child);
-      } else if (child instanceof Array) {
-        element.append(...child);
-      } else if (child instanceof Text) {
-        element.append(child);
-      } else if (child instanceof State) {
-        if (child.state instanceof HTMLElement) {
-          element.append(child.state);
-          child.setUser({
-            apiKey: 'ElementChild',
-            parent: element,
-            element: child.state,
-          });
-        } else if (child.state instanceof Array) {
-          child.state.forEach((state) => {
-            if (typeof state === 'string') {
-              element.append(state);
-            } else if (state instanceof BaseComponent) {
-              if (state.create() instanceof Array) {
-                element.append(...state.create());
-              } else element.append(state.create());
-            } else if (typeof state === 'function') {
-              if (state() instanceof Array) {
-                element.append(...state());
-              } else element.append(state());
-            } else if (state instanceof HTMLElement) {
-              throw Error('Don\'t returned HTMLElement, do function return JSX like this: "() => <tag>"');
-            }
-          });
-          child.setUser({
-            apiKey: 'ArrayChild',
-            parent: element,
-            element: child.state,
-          });
-        } else if (typeof child.state === 'function') {
-          let chils = null;
-          try {
-            chils = child.state();
-            element.append(chils);
-          } catch (err) {
-            // eslint-disable-next-line new-cap
-            chils = new child.state().create();
-            element.append(chils);
-          }
-          child.setUser({
-            apiKey: 'ElementChild',
-            parent: element,
-            element: chils,
-          });
-        } else {
-          let TextChild;
-          if (child.state instanceof Text) {
-            element.append(child.state);
-            child.setUser({
-              apiKey: 'TextChild',
-              parent: element,
-              arg: [child.state],
-            });
-          } else {
-            TextChild = document.createTextNode(child.state);
-            element.append(TextChild);
-          }
-          child.setUser({
-            apiKey: 'TextChild',
-            parent: element,
-            arg: [TextChild],
-          });
-        }
-      } else {
-        element.insertAdjacentText('beforeend', child);
-      }
+      const childResult = typeChecker(child);
+      element.append(...(childResult instanceof Array ? childResult : [childResult]));
     });
     return element;
   },
@@ -99,7 +28,8 @@ const tasks = [
           }
           attr[key].setUser({
             apiKey: 'AttributeState',
-            arg: [key, element],
+            element,
+            arg: [key],
           });
         } else if (attr[key] instanceof Array) {
           SetAttribute.array(attr[key], key, element);
@@ -117,18 +47,38 @@ const tasks = [
 ];
 
 const AmberJsx = {
-  Fragment(_, childs) {
-    return childs;
+  Fragment(childs) {
+    const result = [];
+    childs.forEach((child) => {
+      const item = typeChecker(child);
+      result.push(...(item instanceof Array ? item : [item]));
+    });
+    return result;
   },
   createElement(tag, attr, ...childs) {
     if (typeof tag === 'function') {
       try {
-        return tag(attr, childs);
-      } catch (err) {
-        // eslint-disable-next-line new-cap
         return new tag(attr, childs).create();
+      } catch (err) {
+        if (tag?.name === 'Fragment') {
+          return tag(childs);
+        }
+        try {
+          return tag(attr, childs);
+        } catch (_) {
+          return new tag(attr, childs);
+        }
       }
     }
+    if (tag instanceof BaseComponent) {
+      if (attr !== null) {
+        Object.keys(attr).forEach((key) => {
+          tag.props[key] = attr[key];
+        });
+      }
+      return tag.create();
+    }
+
     const param = [childs, attr];
     let element = document.createElement(tag);
 

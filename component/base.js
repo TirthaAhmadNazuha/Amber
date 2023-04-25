@@ -4,35 +4,30 @@ const BaseComponent = class {
   constructor(props, childs) {
     this.props = props || {};
     this.childs = childs || [];
+    if (this.constructor.name === 'BaseComponent' || this.constructor.name === 'StateComponent') {
+      throw new SyntaxError(`The ${this.constructor.name} is an abstract class, this is not allowed`);
+    }
   }
 
-  render() { }
+  render() {
+    throw new SyntaxError(`The ${this.constructor.name}.render is method not implements!`);
+  }
 
   processJSX() {
     this.elem = this.render();
   }
 
-  isConneted() { }
+  onConnected() { }
 
   create() {
     const parent = document.createElement('div', { is: componentElement });
     const elem = this.elem || this.render();
     parent.elem = elem;
     parent.onConnected = () => {
-      if (elem instanceof Array) {
-        elem.forEach((child) => {
-          if (child instanceof HTMLElement) {
-            parent.insertAdjacentElement('beforebegin', child);
-          } else {
-            parent.insertAdjacentText('beforebegin', child);
-          }
-          this.element = parent.parentElement;
-        });
-      } else if (elem instanceof HTMLElement) {
-        parent.insertAdjacentElement('beforebegin', elem);
-      } else parent.insertAdjacentText('beforebegin', elem);
+      parent.parentElement.append(...(elem instanceof Array ? elem : [elem]));
       this.element = elem;
-      this.isConneted();
+      this.parent = parent.parentElement;
+      this.onConnected();
       parent.remove();
     };
     return parent;
