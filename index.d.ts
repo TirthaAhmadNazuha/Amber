@@ -51,27 +51,18 @@ export declare class BaseComponent {
 }
 
 type State = {
-  key: any;
+  key: string;
+  value: any;
+  /** set or get state value */
+  set val(val);
   get val(): any;
   /** called when the state has changed */
   modifyCallback(): void;
-}
-
-type ArrayState = {
-  key: any;
-  get val(): any;
-  set val(state: any);
-  add(...items: any): void;
-  remove(target: any): void;
-  preAdd(...items: any): void;
-  removeLast(): void;
-  /** called when the state has changed */
-  modifyCallback(): void;
-  get length(): State;
+  triger(): void;
 }
 
 type state = {
-  [K: string]: (State | ArrayState),
+  [K: string]: State,
 }
 export declare class StateComponent extends BaseComponent {
   /**

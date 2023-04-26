@@ -9,13 +9,7 @@ const typeChecker = (item) => {
     return item;
   }
   if (item instanceof State) {
-    const result = typeChecker(item.state);
-    if (item.state instanceof State) {
-      item.value = item.state.state;
-    } else {
-      item.value = item.state;
-    }
-    item.state = result;
+    const result = typeChecker(item.value);
     try {
       if (result?.onConnected) {
         result.setStateUser = () => {
@@ -47,7 +41,7 @@ const typeChecker = (item) => {
     return item;
   }
   if (typeof item === 'string' || typeof item === 'number') {
-    return document.createTextNode(item);
+    return new Text(item);
   }
   if (typeof item === 'function') {
     try {

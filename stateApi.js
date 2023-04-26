@@ -1,7 +1,8 @@
 import State from './component/fragmentComponent/states/state';
 import typeChecker from './typeChecker';
 
-export const ChildState = (newValue, isState, user) => {
+export const ChildState = (newValue, user) => {
+  if (newValue.length === 0) newValue.push(new Text(''));
   const newChild = typeChecker(newValue);
   if (user.element instanceof Array) {
     user.element[user.element.findIndex((c) => c?.parentElement)]
@@ -15,9 +16,6 @@ export const ChildState = (newValue, isState, user) => {
     user.element.replaceWith(...(newChild instanceof Array ? newChild : [newChild]));
   }
   user.element = newChild;
-  isState.state = newChild;
-  isState.value = newValue;
-  isState.changedCallback();
 };
 
 export const SetAttribute = {
@@ -62,7 +60,7 @@ export const SetAttribute = {
   },
 };
 
-export const AttributeState = (value, state, user, key) => {
+export const AttributeState = (value, user, key) => {
   SetAttribute.element = user.element;
   if (value instanceof Array) {
     SetAttribute.array(value, key);
@@ -73,14 +71,10 @@ export const AttributeState = (value, state, user, key) => {
   } else {
     SetAttribute.any(value, key);
   }
-  state.state = value;
-  state.changedCallback();
 };
 
-const AttributeStateObject = (value, state, _, key, element, property) => {
+const AttributeStateObject = (value, _, key, element, property) => {
   element[key][property] = value;
-  state.state = value;
-  state.changedCallback();
 };
 
 const stateApi = {
