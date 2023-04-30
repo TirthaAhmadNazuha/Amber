@@ -1,86 +1,50 @@
-import State from './component/fragmentComponent/states/state';
-import typeChecker from './typeChecker';
+import attrChecker from './attrChecker';
+import typeChecker, { isIterable } from './typeChecker';
 
 export const ChildState = (newValue, user) => {
-  if (newValue.length === 0) newValue.push(new Text(''));
-  const newChild = typeChecker(newValue);
-  if (user.element instanceof Array) {
-    user.element[user.element.findIndex((c) => c?.parentElement)]
-      .replaceWith(...(newChild instanceof Array ? newChild : [newChild]));
-    user.element.forEach((c) => c.remove());
-  } else if (user.element?.elem) {
-    user.element.elem[user.element.elem.findIndex((c) => c?.parentElement)]
-      .replaceWith(...(newChild instanceof Array ? newChild : [newChild]));
-    user.element.elem.forEach((c) => c.remove());
-  } else {
-    user.element.replaceWith(...(newChild instanceof Array ? newChild : [newChild]));
+  const [element] = user.arg;
+  if (newValue instanceof Array) {
+    if (newValue.length === 0) newValue.push(new Text(''));
   }
-  user.element = newChild;
-};
-
-export const SetAttribute = {
-  object(value, key, elem) {
-    Object.keys(value).forEach((property) => {
-      try {
-        if (value[property] instanceof State) {
-          elem[key][property] = value[property].val;
-          value[property].setUser({
-            apiKey: 'AttributeStateObject',
-            arg: [key, elem, property],
-          });
-        } else {
-          elem[key][property] = value[property];
-        }
-      } catch (err) {
-        elem[key] = {};
-        elem[key][property] = value[property];
+  const newChild = typeChecker(newValue);
+  if (element instanceof Array) {
+    element[element.findIndex((c) => c?.parentElement)]
+      .replaceWith(...(isIterable(newChild) ? newChild : [newChild]));
+    element.forEach((c) => c.remove());
+  } else if (element?.elem) {
+    element.elem[element.elem.findIndex((c) => c?.parentElement)]
+      .replaceWith(...(isIterable(newChild) ? newChild : [newChild]));
+    element.elem.forEach((c) => c.remove());
+  } else if (isIterable(element)) {
+    element.forEach((c) => {
+      if (c?.parentElement) {
+        console.log(...newValue);
+        console.log(...newChild);
+        c.replaceWith(...(isIterable(newChild) ? newChild : [newChild]));
       }
     });
-  },
-  array(value, key, elem) {
-    const isString = value.filter((val) => typeof val === 'string').length === value.length;
-    if (isString) {
-      this.any(value.toString().replaceAll(',', ' '), key, elem);
-    } else {
-      elem[key] = value;
-    }
-  },
-  function(value, key, elem) {
-    if (key.startsWith('on') && key.charAt(2).toUpperCase() === key.charAt(2)) {
-      elem.addEventListener(key.slice(2).toLowerCase(), (e) => value(e, elem));
-    } else if (key === 'then') {
-      value(elem);
-    } else {
-      elem.key = value();
-    }
-  },
-  any(value, key, elem) {
-    key = key === 'className' ? 'class' : key;
-    elem.setAttribute(key, value);
-  },
-};
-
-export const AttributeState = (value, user, key) => {
-  SetAttribute.element = user.element;
-  if (value instanceof Array) {
-    SetAttribute.array(value, key);
-  } else if (typeof value === 'function') {
-    SetAttribute.function(value, key);
-  } else if (value instanceof Object) {
-    SetAttribute.object(value, key);
+    element.forEach((c) => c.remove());
   } else {
-    SetAttribute.any(value, key);
+    element?.replaceWith(...(isIterable(newChild) ? newChild : [newChild]));
   }
+  user.arg[0] = newChild;
 };
 
-const AttributeStateObject = (value, _, key, element, property) => {
-  element[key][property] = value;
+export const multilevelAttribute = (newValue, user, oldValue) => {
+  const [key, element, replaceValue] = user.arg;
+  if (oldValue.length === 0) {
+    attrChecker(replaceValue + newValue, key, element);
+  } else attrChecker(replaceValue.replace(oldValue, newValue), key, element);
+};
+
+export const attribute = (newValue, user) => {
+  const [key, element] = user.arg;
+  attrChecker(newValue, key, element);
 };
 
 const stateApi = {
   ChildState,
-  SetAttribute,
-  AttributeState,
-  AttributeStateObject,
+  multilevelAttribute,
+  attribute,
 };
 export default stateApi;

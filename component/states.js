@@ -1,22 +1,34 @@
+/* eslint-disable max-classes-per-file */
+import { usingState } from '..';
+import { DefineSetState, createState } from '../api/usingState';
 import BaseComponent from './base';
-import { setInState, setStateMethod } from './fragmentComponent/states/task';
 
 const StateComponent = class extends BaseComponent {
   constructor(prop, childs) {
     super(prop, childs);
-    this.state = null;
+    this.aState = {};
+    this.aSetState = {};
   }
 
-  makeStates(states) {
-    if (states instanceof Object) {
-      this.state = setInState(states, this.state);
-    } else throw new Error('state must be an object');
+  set state(states) {
+    Object.keys(states).forEach((key) => {
+      const [state, setState] = usingState(states[key]);
+      this.aState[key] = state;
+      this.aSetState[key] = setState;
+    });
+  }
+
+  get state() {
+    return this.aState;
   }
 
   setState(newStates) {
-    if (newStates instanceof Object) {
-      setStateMethod(newStates, this.state);
-    } else throw new Error('newStates must be an object');
+    Object.keys(newStates).forEach((key) => {
+      this.aSetState[key](newStates[key]);
+      const { users, lengthState } = this.aState[key];
+      this.aState[key] = createState(newStates[key], users, lengthState);
+      this.aSetState[key] = new DefineSetState(this.aState[key]).setState;
+    });
   }
 };
 

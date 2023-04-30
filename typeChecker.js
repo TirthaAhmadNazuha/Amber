@@ -1,28 +1,37 @@
 /* eslint-disable consistent-return */
-/* eslint-disable new-cap */
 import { BaseComponent } from '.';
-import State from './component/fragmentComponent/states/state';
+
+export const isIterable = (any) => {
+  if (any === undefined || any == null) return false;
+
+  try {
+    if (typeof any[Symbol.iterator] === 'function') return true;
+    return false;
+  } catch (_) {
+    return false;
+  }
+};
 
 const typeChecker = (item) => {
   if (item === undefined || item == null) return;
-  if (item instanceof HTMLElement) {
+  if (item instanceof Node && item?.stateValue === undefined) {
     return item;
   }
-  if (item instanceof State) {
-    const result = typeChecker(item.value);
+  if (item.constructor.name === 'State' || item?.stateValue !== undefined || item.constructor.name === 'LengthState') {
+    const result = typeChecker(item.stateValue);
     try {
       if (result?.onConnected) {
         result.setStateUser = () => {
           item.setUser({
             apiKey: 'ChildState',
-            element: result,
+            arg: [result],
           });
         };
       } else {
         setTimeout(() => {
           item.setUser({
             apiKey: 'ChildState',
-            element: result,
+            arg: [result],
           });
         });
       }
@@ -37,9 +46,6 @@ const typeChecker = (item) => {
   if (item instanceof Array) {
     return item.map(typeChecker);
   }
-  if (item instanceof Text) {
-    return item;
-  }
   if (typeof item === 'string' || typeof item === 'number') {
     return new Text(item);
   }
@@ -49,6 +55,13 @@ const typeChecker = (item) => {
     } catch (_) {
       return new item().create();
     }
+  }
+  if (isIterable(item)) {
+    const result = new Set();
+    item.forEach((val) => {
+      result.add(typeChecker(val));
+    });
+    return result;
   }
   throw new Error('typeChecker can not find type!');
 };

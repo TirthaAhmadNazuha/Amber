@@ -50,71 +50,27 @@ export declare class BaseComponent {
   childs: Element[];
 }
 
-type State = {
-  key: string;
-  value: any;
-  /** set or get state value */
-  set val(val);
-  get val(): any;
-  /** called when the state has changed */
-  modifyCallback(): void;
-  triger(): void;
-}
-
-type state = {
-  [K: string]: State,
-}
 export declare class StateComponent extends BaseComponent {
-  /**
-   * Use to create an initial state
-   * @example
-   * this.makeStates({
-   *  count: 0,
-   *  items: <h3>There are no items here yet!</h3>,
-   * })
-   */
-  makeStates(states: Object): void;
-
-  /**
-   * a state has initial on makeStates (method)
-   * @example
-   * this.makeStates({
-   *  count: 0
-   * })
-   * 
-   * console.log(this.state.count) // output: State {state: 0, key: 'count', ...}
-   * console.log(this.state.items) // output: undefined
-   * 
-   * @description Dont assign state, do using makeStates (method)
-   * 
-   * Using state
-   * @example
-   * render() {
-   *  this.makeStates({
-   *    greeting: 'Hello AmberJs'
-   *  })
-   *  return (
-   *  <div>
-   *    <h1>{this.state.greeting}</h1>
-   *    <button onClick={() => this.setState({ greeting: 'Hello [Your name]' })}>click</button>
-   *  </div>
-   *  )
-   * }
-   */
-  state: state;
-
-  /** Use it to update state (property) and update JSX.Element that uses state */
-  setState(states: Object): void;
+  setState(states: object): void
+}
+interface setState<T> {
+  (value: T): void;
+}
+export interface UsingState {
+  <T>(value: T extends React.ReactElement ? Element : T): [T extends React.ReactElement ? Element : T, setState<T extends React.ReactElement ? Element : T>]
 }
 
+export const usingState: UsingState;
 export default {
   AmberJsx,
   BaseComponent,
   StateComponent,
+  usingState,
 }
 
 declare module 'amber' {
   AmberJsx;
   BaseComponent;
   StateComponent;
+  usingState
 }
