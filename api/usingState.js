@@ -1,35 +1,11 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable max-classes-per-file */
 import stateApi from '../stateApi';
-import { isIterable } from '../typeChecker';
-
-const checkStateValue = (val) => {
-  if (val?.constructor.name === 'State') {
-    console.warn('State not alowed value insance State. Value has changed to normal value');
-    if (val instanceof Array) {
-      const result = new Array(...val);
-      return result;
-    }
-    if (isIterable(val)) {
-      const result = new Set();
-      val.forEach((item) => result.add(item));
-      return result;
-    }
-    if (val instanceof String) {
-      return `${val}`;
-    }
-    if (val instanceof Number) {
-      return val + 0;
-    }
-    throw new Error('State not suport Object type!');
-  }
-  return val;
-};
 
 const LengthState = class extends Number {
   constructor(val, parentState, users = false) {
     super(val);
-    this.aStateValue = checkStateValue(val) || null;
+    this.aStateValue = val || null;
     this.parentState = parentState;
     this.setLength = new DefineSetState(this).setState;
     this.users = users || new Set();
@@ -69,16 +45,26 @@ export const createState = (initialValue, users = false, lengthState = false) =>
   const State = class extends initialValue.constructor {
     constructor(val) {
       super(...(val instanceof Array ? val : [val]));
-      this.aStateValue = checkStateValue(val);
+      this.aStateValue = val;
       this.users = users || new Set();
       if (lengthState) this.lengthState = lengthState;
+
+      if (val instanceof Array) {
+        this.map = ((callbackfn) => {
+          const result = new State([]);
+          this.forEach((item, i) => {
+            const c = callbackfn(item, i);
+            result.push(c);
+            result.stateValue.push(c);
+          });
+          return result;
+        });
+      }
     }
 
     set stateValue(val) {
-      this.aStateValue = checkStateValue(val);
-      if (this.lengthState instanceof LengthState) {
-        this.lengthState.set(val.length || val.size);
-      }
+      this.aStateValue = val;
+      if (this.lengthState) this.lengthState.set(val.length || val.size);
     }
 
     get stateValue() {

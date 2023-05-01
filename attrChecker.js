@@ -1,9 +1,20 @@
+import { isIterable } from './typeChecker';
+
 const specialAttributes = [
   {
-    key: 'test',
-    val() {
+    key: 'then',
+    val(callback, elem) {
       setTimeout(() => {
-        console.log('test');
+        callback(elem);
+      });
+    },
+  },
+  {
+    key: 'theme',
+    val(props, elem) {
+      Object.keys(props).forEach((key) => {
+        // eslint-disable-next-line no-use-before-define
+        attrChecker(props[key], key, elem);
       });
     },
   },
@@ -37,9 +48,9 @@ const checkValAttr = (val, key, element) => {
     });
     return result;
   }
+  if (val === undefined || val == null) return 'true';
   return val;
 };
-
 const reMakeKey = (key) => {
   if (key === 'className') return 'class';
   if (key.startsWith('on') && key.slice(2).toLowerCase() !== key.slice(2)) {
@@ -51,7 +62,7 @@ const reMakeKey = (key) => {
 const attrChecker = (val, key, element) => {
   const specialAttribute = specialAttributes.find((attr) => attr.key === key);
   if (specialAttribute) {
-    specialAttribute.val(element, checkValAttr(val, key, element));
+    specialAttribute.val(val, element);
   } else {
     const remakeKey = reMakeKey(key);
     const AmberEvent = (event) => {
@@ -64,6 +75,10 @@ const attrChecker = (val, key, element) => {
           break;
         default: break;
       }
+    } else if (val instanceof Object && !isIterable(val)) {
+      Object.keys(val).forEach((k) => {
+        element[key][k] = val[k];
+      });
     } else {
       element.setAttribute(remakeKey, checkValAttr(val, key, element));
     }

@@ -18,8 +18,6 @@ export const ChildState = (newValue, user) => {
   } else if (isIterable(element)) {
     element.forEach((c) => {
       if (c?.parentElement) {
-        console.log(...newValue);
-        console.log(...newChild);
         c.replaceWith(...(isIterable(newChild) ? newChild : [newChild]));
       }
     });

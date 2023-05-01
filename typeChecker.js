@@ -63,6 +63,9 @@ const typeChecker = (item) => {
     });
     return result;
   }
+  if (typeof item === 'boolean') {
+    return '';
+  }
   throw new Error('typeChecker can not find type!');
 };
 
