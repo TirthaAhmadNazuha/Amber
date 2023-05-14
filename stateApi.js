@@ -40,9 +40,15 @@ export const attribute = (newValue, user) => {
   attrChecker(newValue, key, element);
 };
 
+export const objectAttribute = (newValue, user) => {
+  const [key, element, k] = user.arg;
+  element[key][k] = newValue;
+};
+
 const stateApi = {
   ChildState,
   multilevelAttribute,
   attribute,
+  objectAttribute,
 };
 export default stateApi;

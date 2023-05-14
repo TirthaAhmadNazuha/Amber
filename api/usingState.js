@@ -33,6 +33,9 @@ const LengthState = class extends Number {
 };
 
 export const createState = (initialValue, users = false, lengthState = false) => {
+  if (initialValue instanceof Promise) {
+    throw new Error('State not support promise value');
+  }
   if (initialValue instanceof Node) {
     const state = initialValue;
     state.stateValue = () => initialValue.cloneNode(true);

@@ -21,7 +21,7 @@ const specialAttributes = [
 ];
 
 const checkValAttr = (val, key, element) => {
-  if (val?.stateValue !== undefined || val.constructor.name === 'State' || val.constructor.name === 'LengthState') {
+  if (val?.stateValue !== undefined && (val.constructor.name === 'State' || val.constructor.name === 'LengthState')) {
     val.setUser({
       apiKey: 'attribute',
       arg: [key, element],
@@ -77,9 +77,31 @@ const attrChecker = async (value, key, element) => {
         default: break;
       }
     } else if (val instanceof Object && !isIterable(val)) {
-      Object.keys(val).forEach((k) => {
-        element[key][k] = val[k];
-      });
+      if (val?.stateValue !== undefined && (val.constructor.name === 'State' || val.constructor.name === 'LengthState')) {
+        val.setUser({
+          apiKey: 'attribute',
+          arg: [key, element],
+        });
+        Object.keys(val.stateValue).forEach((k) => {
+          if (val.stateValue[k]?.stateValue !== undefined && (val.stateValue[k].constructor.name === 'State' || val.stateValue[k].constructor.name === 'LengthState')) {
+            val.stateValue[k].setUser({
+              apiKey: 'objectAttribute',
+              arg: [key, element, k],
+            });
+          }
+          element[key][k] = val.stateValue[k];
+        });
+      } else {
+        Object.keys(val).forEach(async (k) => {
+          if (await val[k]?.stateValue !== undefined && (await val[k].constructor.name === 'State' || await val[k].constructor.name === 'LengthState')) {
+            val[k].setUser({
+              apiKey: 'objectAttribute',
+              arg: [key, element, k],
+            });
+          }
+          element[key][k] = await val[k];
+        });
+      }
     } else {
       element.setAttribute(remakeKey, checkValAttr(val, key, element));
     }
