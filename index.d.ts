@@ -62,11 +62,11 @@ export interface UsingState {
 
 interface AwaitProps {
   resolve: Promise
-  pending: Element
-  reject: Element
+  onPending: Element
+  onReject: Element
 }
 
-export const Await = (props: AwaitProps): void => { }
+export const Await = (props: AwaitProps): AmberJsx.createElement => { }
 
 
 export const usingState: UsingState;
