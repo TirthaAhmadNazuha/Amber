@@ -59,8 +59,9 @@ const reMakeKey = (key) => {
   return key;
 };
 
-const attrChecker = (val, key, element) => {
+const attrChecker = async (value, key, element) => {
   const specialAttribute = specialAttributes.find((attr) => attr.key === key);
+  const val = await value;
   if (specialAttribute) {
     specialAttribute.val(val, element);
   } else {

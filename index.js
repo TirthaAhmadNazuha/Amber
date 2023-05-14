@@ -3,6 +3,7 @@ import AmberJsx from './amberJsx';
 import BaseComponent from './component/base';
 import StateComponent from './component/states';
 import usingState from './api/usingState';
+import Await from './buildit/await';
 
 const Amber = {
   AmberJsx,
@@ -12,6 +13,11 @@ const Amber = {
 };
 
 export {
+  BaseComponent,
+  StateComponent,
+  usingState,
+  AmberJsx,
+  Await,
   // eslint-disable-next-line no-restricted-exports
-  BaseComponent, StateComponent, usingState, AmberJsx, Amber as default,
+  Amber as default,
 };

@@ -60,17 +60,35 @@ export interface UsingState {
   <T>(value: T extends React.ReactElement ? Element : T): [T extends React.ReactElement ? Element : T, setState<T extends React.ReactElement ? Element : T>]
 }
 
+interface AwaitProps {
+  resolve: Promise
+  pending: Element
+  reject: Element
+}
+
+export const Await = (props: AwaitProps): void => { }
+
+
 export const usingState: UsingState;
 export default {
   AmberJsx,
   BaseComponent,
   StateComponent,
   usingState,
+  Await,
 }
 
 declare module 'amber' {
   AmberJsx;
   BaseComponent;
   StateComponent;
-  usingState
+  usingState;
+  Await;
+}
+
+declare module 'react' {
+  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+    then?(elem: T): void;
+    theme?: Object;
+  }
 }

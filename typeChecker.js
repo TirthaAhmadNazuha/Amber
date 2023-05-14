@@ -56,6 +56,28 @@ const typeChecker = (item) => {
       return new item().create();
     }
   }
+  if (item instanceof Promise) {
+    const pendingElement = typeChecker(item?.onPending) || new Text('');
+    const rejectElement = typeChecker(item?.onReject);
+    item.then((response) => {
+      const childResult = item.childs.map((ch) => {
+        if (typeof ch === 'function') {
+          return typeChecker(ch(response));
+        }
+        return typeChecker(ch);
+      });
+
+      pendingElement.replaceWith(...childResult);
+    })
+      .catch((err) => {
+        if (rejectElement) {
+          pendingElement
+            .replaceWith(...(isIterable(rejectElement) ? rejectElement : [rejectElement]));
+        }
+        throw new Error(err);
+      });
+    return pendingElement;
+  }
   if (isIterable(item)) {
     const result = new Set();
     item.forEach((val) => {
