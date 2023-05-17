@@ -1,6 +1,4 @@
 /* eslint-disable max-classes-per-file */
-import { usingState } from '..';
-import { DefineSetState, createState } from '../api/usingState';
 import BaseComponent from './base';
 
 const StateComponent = class extends BaseComponent {
