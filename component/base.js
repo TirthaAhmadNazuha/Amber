@@ -1,4 +1,4 @@
-import componentElement from './fragmentComponent/component-element';
+import { isIterable } from '../typeChecker';
 
 const BaseComponent = class {
   constructor(props, childs) {
@@ -20,17 +20,23 @@ const BaseComponent = class {
   onConnected() { }
 
   create() {
-    const parent = document.createElement('div', { is: componentElement });
     const elem = this.elem || this.render();
-    parent.elem = elem;
-    parent.onConnected = () => {
-      parent.parentElement.append(...(elem instanceof Array ? elem : [elem]));
+    if (isIterable(elem)) {
+      const textForGettingParent = new Text();
+      textForGettingParent.addEventListener('DOMNodeInserted', () => {
+        this.parent = textForGettingParent.parentElement;
+        textForGettingParent.replaceWith(elem);
+        this.element = elem;
+        this.onConnected();
+      });
+      return textForGettingParent;
+    }
+    elem.addEventListener('DOMNodeInserted', () => {
+      this.parent = elem.parentElement;
       this.element = elem;
-      this.parent = parent.parentElement;
       this.onConnected();
-      parent.remove();
-    };
-    return parent;
+    });
+    return elem;
   }
 };
 
