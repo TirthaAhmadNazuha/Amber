@@ -25,7 +25,7 @@ const BaseComponent = class {
       const textForGettingParent = new Text();
       textForGettingParent.addEventListener('DOMNodeInserted', () => {
         this.parent = textForGettingParent.parentElement;
-        textForGettingParent.replaceWith(elem);
+        textForGettingParent.replaceWith(...elem);
         this.element = elem;
         this.onConnected();
       });
