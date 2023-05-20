@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 import { BaseComponent } from '.';
+import CreateState from './api/createState';
 
 export const isIterable = (any) => {
   if (any === undefined || any == null) return false;
@@ -14,29 +15,21 @@ export const isIterable = (any) => {
 
 const typeChecker = (item) => {
   if (item === undefined || item == null) return;
-  if (item instanceof Node && item?.stateValue === undefined) {
+  if (item instanceof Node) {
     return item;
   }
-  if (item.constructor.name === 'State' || item?.stateValue !== undefined || item.constructor.name === 'LengthState') {
-    const result = typeChecker(item.stateValue);
-    try {
-      if (result?.onConnected) {
-        result.setStateUser = () => {
-          item.setUser({
-            apiKey: 'ChildState',
-            arg: [result],
-          });
-        };
-      } else {
-        setTimeout(() => {
-          item.setUser({
-            apiKey: 'ChildState',
-            arg: [result],
-          });
-        });
-      }
-    } catch (err) {
-      throw new Error('Cant set user in typeChecker');
+  if (item instanceof CreateState) {
+    const result = typeChecker(item.value);
+    if (result instanceof Node) {
+      item.subcribe(result, 'children');
+      return result;
+    }
+    if (isIterable(result)) {
+      result.forEach((el) => {
+        if (el instanceof Node) {
+          item.subcribe(el, 'children');
+        }
+      });
     }
     return result;
   }

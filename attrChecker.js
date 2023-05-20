@@ -1,3 +1,4 @@
+import CreateState from './api/createState';
 import { isIterable } from './typeChecker';
 
 const specialAttributes = [
@@ -20,36 +21,73 @@ const specialAttributes = [
   },
 ];
 
+const checkFrontProp = (element, key) => {
+  if (element[key] !== undefined) return false;
+  return true;
+};
+
+export const remakeArray = (arr) => {
+  try {
+    return arr.toString().replaceAll(',', ' ');
+  } catch (_) { /* empty */ }
+};
+
 const checkValAttr = (val, key, element) => {
-  if (val?.stateValue !== undefined && (val.constructor.name === 'State' || val.constructor.name === 'LengthState')) {
-    val.setUser({
-      apiKey: 'attribute',
-      arg: [key, element],
-    });
-    return val.stateValue;
-  }
   if (val instanceof Array) {
+    const result = [];
     const states = new Set();
-    const result = val.map((v) => {
-      if (typeof v === 'function') {
-        return checkValAttr(v());
-      }
-      if (v?.stateValue !== undefined || v.constructor.name === 'State' || v.constructor.name === 'LengthState') {
+    val.forEach((v) => {
+      if (v instanceof CreateState) {
         states.add(v);
-        return v.stateValue;
+        result.push(v.value);
+      } else {
+        result.push(v);
       }
-      return v;
-    }).toString().replace(',', ' ');
+    });
     states.forEach((state) => {
-      state.setUser({
-        apiKey: 'multilevelAttribute',
-        arg: [key, element, result],
+      state.subcribe(element, 'arrAttr', {
+        key,
+        mergingVal: result.map((res) => {
+          if (res === state.value) {
+            return '{{}}';
+          }
+          return res;
+        }),
       });
     });
-    return result;
+    if (checkFrontProp(element, key)) {
+      element.setAttribute(key, remakeArray(result));
+    } else {
+      element[key] = result;
+    }
+    return;
   }
-  if (val === undefined || val == null) return 'true';
-  return val;
+  if (val instanceof CreateState) {
+    if (checkFrontProp(element, key)) {
+      val.subcribe(element, 'frontAttr', { key });
+    } else {
+      val.subcribe(element, 'property', { key });
+    }
+    checkValAttr(val.value, key, element);
+    return;
+  }
+  if (typeof val === 'object') {
+    Object.keys(val).forEach((k) => {
+      if (val[k] instanceof CreateState) {
+        val[k].subcribe(element, 'objectAttr', {
+          key,
+          k,
+        });
+        element[key][k] = val[k].value;
+      } else element[key][k] = val[k];
+    });
+    return;
+  }
+  if (checkFrontProp(element, key)) {
+    element.setAttribute(key, isIterable(val) ? remakeArray(val) : val);
+    return;
+  }
+  element[key] = val;
 };
 const reMakeKey = (key) => {
   if (key === 'className') return 'class';
@@ -64,46 +102,14 @@ const attrChecker = async (value, key, element) => {
   const val = await value;
   if (specialAttribute) {
     specialAttribute.val(val, element);
-  } else {
-    const remakeKey = reMakeKey(key);
-    const AmberEvent = (event) => {
-      checkValAttr(val, key, element)(event, element);
-    };
-    if (typeof remakeKey === 'object') {
-      switch (remakeKey.desc) {
-        case 'event':
-          element.addEventListener(remakeKey.key, AmberEvent);
-          break;
-        default: break;
-      }
-    } else if (val instanceof Object && !isIterable(val)) {
-      if (val?.stateValue !== undefined && (val.constructor.name === 'State' || val.constructor.name === 'LengthState')) {
-        val.setUser({
-          apiKey: 'attribute',
-          arg: [key, element],
-        });
-        Object.keys(val.stateValue).forEach((k) => {
-          if (val.stateValue[k]?.stateValue !== undefined && (val.stateValue[k].constructor.name === 'State' || val.stateValue[k].constructor.name === 'LengthState')) {
-            val.stateValue[k].setUser({
-              apiKey: 'objectAttribute',
-              arg: [key, element, k],
-            });
-          }
-          element[key][k] = val.stateValue[k];
-        });
-      } else {
-        Object.keys(val).forEach(async (k) => {
-          if (await val[k]?.stateValue !== undefined && (await val[k].constructor.name === 'State' || await val[k].constructor.name === 'LengthState')) {
-            val[k].setUser({
-              apiKey: 'objectAttribute',
-              arg: [key, element, k],
-            });
-          }
-          element[key][k] = await val[k];
-        });
-      }
-    } else {
-      element.setAttribute(remakeKey, checkValAttr(val, key, element));
+    return;
+  }
+  const rekey = reMakeKey(key);
+  if (typeof rekey === 'string') {
+    checkValAttr(val, key, element);
+  } else if (typeof rekey === 'object') {
+    if (rekey.desc === 'event') {
+      element.addEventListener(rekey.key, val);
     }
   }
 };

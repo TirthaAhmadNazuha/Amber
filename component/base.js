@@ -23,19 +23,24 @@ const BaseComponent = class {
     const elem = this.elem || this.render();
     if (isIterable(elem)) {
       const textForGettingParent = new Text();
-      textForGettingParent.addEventListener('DOMNodeInserted', () => {
+      textForGettingParent.isElementFragment = elem;
+      const DOMNodeInserted = () => {
         this.parent = textForGettingParent.parentElement;
         textForGettingParent.replaceWith(...elem);
         this.element = elem;
         this.onConnected();
-      });
+        textForGettingParent.removeEventListener('DOMNodeInserted', DOMNodeInserted);
+      };
+      textForGettingParent.addEventListener('DOMNodeInserted', DOMNodeInserted);
       return textForGettingParent;
     }
-    elem.addEventListener('DOMNodeInserted', () => {
+    const Inserted = () => {
       this.parent = elem.parentElement;
       this.element = elem;
       this.onConnected();
-    });
+      this.element.removeEventListener('DOMNodeInserted', Inserted);
+    };
+    elem.addEventListener('DOMNodeInserted', Inserted);
     return elem;
   }
 };
