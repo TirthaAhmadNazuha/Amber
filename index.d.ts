@@ -54,10 +54,14 @@ export declare class StateComponent extends BaseComponent {
   setState(states: object): void
 }
 interface setState<T> {
-  (value: T): void;
+  (value: T): void
+}
+interface CreateState<T> {
+  value: T;
+  users: Set,
 }
 export interface UsingState {
-  <T>(value: T extends React.ReactElement ? Element : T): [T extends React.ReactElement ? Element : T, setState<T extends React.ReactElement ? Element : T>]
+  <T>(value: T extends React.ReactElement ? Element : T): [T extends React.ReactElement ? CreateState<Element> : CreateState<T>, setState<T extends React.ReactElement ? Element : T>]
 }
 
 interface AwaitProps {
