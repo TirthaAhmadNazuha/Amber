@@ -109,7 +109,10 @@ const attrChecker = async (value, key, element) => {
     checkValAttr(val, key, element);
   } else if (typeof rekey === 'object') {
     if (rekey.desc === 'event') {
-      element.addEventListener(rekey.key, val);
+      const AmberEvent = (e) => {
+        val(e, element);
+      };
+      element.addEventListener(rekey.key, AmberEvent);
     }
   }
 };
