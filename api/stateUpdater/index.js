@@ -1,7 +1,12 @@
-import child from './children';
+import children from './children';
+import frontAttr, { property, arrAttr, objectAttr } from './attribute';
 
 const stateUpdater = {
-  child,
+  children,
+  frontAttr,
+  property,
+  arrAttr,
+  objectAttr,
 };
 
 export default stateUpdater;

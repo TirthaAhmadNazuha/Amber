@@ -15,14 +15,21 @@ export const isIterable = (any) => {
 
 const typeChecker = (item) => {
   if (item === undefined || item == null) return;
-  if (item instanceof Node && item?.stateValue === undefined) {
+  if (item instanceof Node) {
     return item;
   }
   if (item instanceof CreateState) {
     const result = typeChecker(item.value);
     if (result instanceof Node) {
-      item.subcribe(result);
+      item.subcribe(result, 'children');
       return result;
+    }
+    if (isIterable(result)) {
+      result.forEach((el) => {
+        if (el instanceof Node) {
+          item.subcribe(el, 'children');
+        }
+      });
     }
     return result;
   }

@@ -1,5 +1,5 @@
-/* eslint-disable max-classes-per-file */
 import BaseComponent from './base';
+import usingState from '../api/usingState';
 
 const StateComponent = class extends BaseComponent {
   constructor(prop, childs) {
@@ -23,9 +23,6 @@ const StateComponent = class extends BaseComponent {
   setState(newStates) {
     Object.keys(newStates).forEach((key) => {
       this.aSetState[key](newStates[key]);
-      const { users, lengthState } = this.aState[key];
-      this.aState[key] = createState(newStates[key], users, lengthState);
-      this.aSetState[key] = new DefineSetState(this.aState[key]).setState;
     });
   }
 };

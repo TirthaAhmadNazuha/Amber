@@ -1,25 +1,25 @@
-import typeChecker from '../typeChecker';
-import children from './stateUpdater/children';
+import stateUpdater from './stateUpdater';
 
 const CreateState = class {
   constructor(initialValue) {
-    this.value = initialValue;
+    if (initialValue?.isElementFragment) {
+      this.value = initialValue.isElementFragment;
+    } else this.value = initialValue;
+
     this.users = new Set();
-    this.type = 'children';
   }
 
-  subcribe(node) {
-    node.update = (newValue) => {
-      if (this.type === 'children') {
-        children(node, typeChecker(newValue));
-      }
-    };
-    this.users.add(node);
+  subcribe(node, type, option) {
+    this.users.add({
+      update(newVal) {
+        stateUpdater[type](node, newVal, option);
+      },
+    });
   }
 
   dispatch() {
-    this.users.forEach((node) => {
-      node.update(this.value);
+    this.users.forEach((user) => {
+      user.update(this.value);
     });
   }
 };
