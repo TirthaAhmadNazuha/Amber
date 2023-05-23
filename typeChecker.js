@@ -13,25 +13,36 @@ export const isIterable = (any) => {
   }
 };
 
+const HandlerState = class {
+  constructor() {
+    this.users = new Set();
+    this.createState = null;
+    setTimeout(() => {
+      if (this.createState == null) return;
+      this.subcribing();
+    }, 50);
+  }
+
+  add(node) {
+    if (this.users.has(node)) return;
+    this.users.add(node);
+  }
+
+  subcribing() {
+    this.createState.subcribe(this.users, 'children');
+  }
+};
 const typeChecker = (item) => {
+  const handlerState = new HandlerState();
   if (item === undefined || item == null) return;
+  if (item instanceof CreateState) {
+    handlerState.createState = item;
+    const result = typeChecker(item.value);
+    handlerState.add(result);
+    return result;
+  }
   if (item instanceof Node) {
     return item;
-  }
-  if (item instanceof CreateState) {
-    const result = typeChecker(item.value);
-    if (result instanceof Node) {
-      item.subcribe(result, 'children');
-      return result;
-    }
-    if (isIterable(result)) {
-      result.forEach((el) => {
-        if (el instanceof Node) {
-          item.subcribe(el, 'children');
-        }
-      });
-    }
-    return result;
   }
   if (item instanceof BaseComponent) {
     return item.create();

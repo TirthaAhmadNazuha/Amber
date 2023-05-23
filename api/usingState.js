@@ -1,3 +1,4 @@
+import { BaseComponent } from '..';
 import CreateState from './createState';
 
 const usingState = (initialValue) => {
@@ -5,6 +6,8 @@ const usingState = (initialValue) => {
   const setState = (newValue) => {
     if (newValue?.isElementFragment) {
       state.value = newValue.isElementFragment;
+    } else if (newValue instanceof BaseComponent) {
+      state.value = newValue.create();
     } else state.value = newValue;
     state.dispatch();
   };
