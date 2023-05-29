@@ -53,6 +53,7 @@ const AmberJsx = {
       if (attr !== null) {
         Object.keys(attr).forEach((key) => {
           tag.props[key] = attr[key];
+          tag.childs = childs;
         });
       }
       return tag.create();

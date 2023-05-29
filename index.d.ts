@@ -76,12 +76,23 @@ interface AwaitInterface {
 }
 export const Await: AwaitInterface
 
+interface IfProps {
+  condition: boolean
+}
+interface IfInterface {
+  (props: IfProps): AmberJsx.createElement
+  Else: AmberJsx.createElement
+  Elif: IfInterface
+}
+export const If: IfInterface
+
 export default {
   AmberJsx,
   BaseComponent,
   StateComponent,
   usingState,
   Await,
+  If
 }
 
 
@@ -91,6 +102,7 @@ declare module 'amber' {
   StateComponent
   usingState
   Await
+  If
 }
 
 declare module 'react' {
@@ -99,6 +111,7 @@ declare module 'react' {
     theme?: Object
   }
   Await
+  If
 }
 
 

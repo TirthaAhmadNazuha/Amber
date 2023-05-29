@@ -92,6 +92,7 @@ const typeChecker = (item) => {
   if (typeof item === 'boolean') {
     return '';
   }
+  console.log(item);
   throw new Error('typeChecker can not find type!');
 };
 
