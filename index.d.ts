@@ -109,6 +109,8 @@ declare module 'react' {
   interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
     then?(elem: T): void
     theme?: Object
+    onHover?(event: MouseEvent, elem: T): void
+    onClick?(event: MouseEvent, elem: T): void
   }
   Await
   If

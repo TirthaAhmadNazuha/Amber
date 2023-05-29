@@ -112,7 +112,12 @@ const attrChecker = async (value, key, element) => {
       const AmberEvent = (e) => {
         val(e, element);
       };
-      element.addEventListener(rekey.key, AmberEvent);
+      if (rekey.key === 'hover') {
+        element.addEventListener('mouseover', AmberEvent);
+        element.addEventListener('mouseout', AmberEvent);
+      } else {
+        element.addEventListener(rekey.key, AmberEvent);
+      }
     }
   }
 };
