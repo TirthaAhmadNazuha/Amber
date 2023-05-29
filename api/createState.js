@@ -4,9 +4,9 @@ import stateUpdater from './stateUpdater';
 const CreateState = class {
   constructor(initialValue, parent) {
     if (initialValue?.isElementFragment) {
-      this.value = initialValue.isElementFragment;
+      this._value = initialValue.isElementFragment;
     } else if (initialValue instanceof BaseComponent) {
-      this.value = initialValue.create();
+      this._value = initialValue.create();
     } else if (typeof initialValue === 'object' && !(initialValue instanceof Node)) {
       const states = {};
       Object.keys(initialValue).forEach((key) => {
@@ -14,31 +14,33 @@ const CreateState = class {
         states[key] = v;
         this[key] = v;
       });
-      this.Value = states;
-    } else this.value = initialValue;
+      this._value = states;
+    } else this._value = initialValue;
 
     this.parent = parent;
     this.users = new Set();
   }
 
   set value(value) {
-    if (typeof this.Value === 'object' && !(this.Value instanceof Node)) {
-      Object.keys(this.Value).forEach((key) => {
-        this.Value[key].value = (value[key]);
+    if (typeof this._value === 'object' && !(this._value instanceof Node)) {
+      Object.keys(this._value).forEach((key) => {
+        this._value[key].value = (value[key]);
       });
-    } else this.Value = value;
+    } else this._value = value;
   }
 
   get value() {
-    return this.Value;
+    return this._value;
   }
 
   subcribe(nodes, type, option = {}) {
     const user = {
       nodes,
       update(newVal) {
-        stateUpdater[type](this.nodes, newVal, option);
-        if (type === 'children') this.nodes = newVal;
+        const result = stateUpdater[type](this.nodes, newVal, option);
+        if (result) {
+          this.nodes = result;
+        }
       },
     };
     this.users.add(user);
@@ -48,11 +50,11 @@ const CreateState = class {
 
   dispatch() {
     this.users.forEach((user) => {
-      if (typeof this.Value === 'object' && !(this.Value instanceof Node) && !(this.Value instanceof BaseComponent)) {
-        Object.keys(this.Value).forEach((key) => {
-          this.Value[key].dispatch();
+      if (typeof this._value === 'object' && !(this._value instanceof Node) && !(this._value instanceof BaseComponent)) {
+        Object.keys(this._value).forEach((key) => {
+          this._value[key].dispatch();
         });
-      } else user.update(this.value);
+      } else user.update(this._value);
     });
   }
 };

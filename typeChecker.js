@@ -15,7 +15,7 @@ export const isIterable = (any) => {
 
 const HandlerState = class {
   constructor() {
-    this.users = new Set();
+    this.users = [];
     this.createState = null;
     setTimeout(() => {
       if (this.createState == null) return;
@@ -24,8 +24,8 @@ const HandlerState = class {
   }
 
   add(node) {
-    if (this.users.has(node)) return;
-    this.users.add(node);
+    if (this.users.find((n) => n === node)) return;
+    this.users.push(node);
   }
 
   subcribing() {
