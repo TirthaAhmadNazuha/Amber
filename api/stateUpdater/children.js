@@ -1,15 +1,12 @@
-import { isIterable } from '../../typeChecker';
+import typeChecker from '../../typeChecker';
 
 const children = (isUsers, newNode) => {
-  const result = newNode instanceof Node ? newNode : null;
-  if (isUsers instanceof Array) {
-    isUsers[0].replaceWith(...(isIterable(newNode) ? newNode : [newNode]));
-    isUsers.forEach((c) => c.remove());
-  } else if (typeof newNode !== 'object') {
-    isUsers.textChontent = newNode;
-  } else isUsers.replaceWith(...(isIterable(newNode) ? newNode : [newNode]));
-
-  return result;
+  newNode = typeChecker(newNode);
+  isUsers.forEach((user) => {
+    user.replaceWith(newNode);
+  });
+  console.log(isUsers, newNode);
+  return [newNode];
 };
 
 export default children;
