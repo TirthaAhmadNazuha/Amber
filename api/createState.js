@@ -19,6 +19,7 @@ const CreateState = class {
 
     this.parent = parent;
     this.users = new Set();
+    this.dispatchIn = false;
   }
 
   set value(value) {

@@ -5,7 +5,6 @@ const children = (isUsers, newNode) => {
   isUsers.forEach((user) => {
     user.replaceWith(newNode);
   });
-  console.log(isUsers, newNode);
   return [newNode];
 };
 
