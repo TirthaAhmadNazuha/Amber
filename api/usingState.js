@@ -4,6 +4,10 @@ import CreateState from './createState';
 const usingState = (initialValue) => {
   const state = new CreateState(initialValue);
   const setState = (newValue) => {
+    if (typeof newValue === 'function') {
+      newValue = newValue(state.value);
+    }
+
     if (newValue?.isElementFragment) {
       state.value = newValue.isElementFragment;
     } else if (newValue instanceof BaseComponent) {

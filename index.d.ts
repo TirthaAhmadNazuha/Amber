@@ -56,10 +56,11 @@ export declare class StateComponent extends BaseComponent {
 
 interface setState<T> {
   (value: T): void
+  (callback: (value: T) => T): void
 }
 interface CreateState<T> {
   value: T
-  users: Set,
+  users: Set
 }
 interface UsingState {
   <T>(value: T extends React.ReactElement ? Element : T): [T extends React.ReactElement ? CreateState<Element> : CreateState<T>, setState<T extends React.ReactElement ? Element : T>]
