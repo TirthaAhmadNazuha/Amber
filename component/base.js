@@ -14,13 +14,13 @@ const BaseComponent = class {
   }
 
   processJSX() {
-    this.elem = this.render();
+    this.element = this.render();
   }
 
   onConnected() { }
 
   create() {
-    const elem = this.elem || this.render();
+    const elem = this.element || this.render();
     if (isIterable(elem)) {
       const textForGettingParent = new Text();
       textForGettingParent.isElementFragment = elem;

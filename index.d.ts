@@ -48,6 +48,8 @@ export declare class BaseComponent {
    * <MyComponent>[...childs]</MyComponent>
    */
   childs: Element[]
+
+  parent: HTMLElement
 }
 
 export declare class StateComponent extends BaseComponent {

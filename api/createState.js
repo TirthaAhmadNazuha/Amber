@@ -1,4 +1,5 @@
 import { BaseComponent } from '..';
+import { isIterable } from '../typeChecker';
 import stateUpdater from './stateUpdater';
 
 const CreateState = class {
@@ -7,7 +8,7 @@ const CreateState = class {
       this._value = initialValue.isElementFragment;
     } else if (initialValue instanceof BaseComponent) {
       this._value = initialValue.create();
-    } else if (typeof initialValue === 'object' && !(initialValue instanceof Node)) {
+    } else if (typeof initialValue === 'object' && !(initialValue instanceof Node) && !isIterable(initialValue)) {
       const states = {};
       Object.keys(initialValue).forEach((key) => {
         const v = new CreateState(initialValue[key], this);
@@ -19,7 +20,7 @@ const CreateState = class {
 
     this.parent = parent;
     this.users = new Set();
-    this.dispatchIn = false;
+    this.onChange = null;
   }
 
   set value(value) {
@@ -57,6 +58,7 @@ const CreateState = class {
         });
       } else user.update(this._value);
     });
+    if (typeof this.onChange === 'function') this.onChange(this._value);
   }
 };
 
