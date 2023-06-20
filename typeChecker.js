@@ -32,7 +32,7 @@ const HandlerState = class {
     this.createState.subcribe(this.users, 'children');
   }
 };
-const typeChecker = (item) => {
+const typeChecker = (item, options = {}) => {
   const handlerState = new HandlerState();
   if (item === undefined || item == null) return;
   if (item instanceof CreateState) {
@@ -55,21 +55,16 @@ const typeChecker = (item) => {
   }
   if (typeof item === 'function') {
     try {
-      return typeChecker(item());
+      return typeChecker(item(options?.isPromise));
     } catch (_) {
-      return new item().create();
+      return new item(options?.isPromise).create();
     }
   }
   if (item instanceof Promise) {
-    const pendingElement = typeChecker(item?.onPending) || new Text('');
-    const rejectElement = typeChecker(item?.onReject);
+    const pendingElement = typeChecker(item?.onPending) || new Text();
+    const rejectElement = typeChecker(item?.onReject) || new Text();
     item.then((response) => {
-      const childResult = item.childs.map((ch) => {
-        if (typeof ch === 'function') {
-          return typeChecker(ch(response));
-        }
-        return typeChecker(ch);
-      });
+      const childResult = item.childs.map((ch) => typeChecker(ch, { isPromise: response }));
 
       pendingElement.replaceWith(...childResult);
     })
