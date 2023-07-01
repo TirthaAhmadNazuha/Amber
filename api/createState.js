@@ -25,19 +25,11 @@ const CreateState = class {
   }
 
   set value(value) {
-    const set = () => {
-      if (typeof this._value === 'object' && !(this._value instanceof Node)) {
-        Object.keys(this._value).forEach((key) => {
-          this._value[key].value = (value[key]);
-        });
-      } else this._value = value;
-    };
-    if (typeof this.preChange === 'function') {
-      this.preChange(value)
-        .then(() => {
-          set();
-        });
-    } else set();
+    if (typeof this._value === 'object' && !(this._value instanceof Node)) {
+      Object.keys(this._value).forEach((key) => {
+        this._value[key].value = (value[key]);
+      });
+    } else this._value = value;
   }
 
   get value() {
