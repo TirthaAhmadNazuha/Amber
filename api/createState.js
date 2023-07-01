@@ -36,7 +36,7 @@ const CreateState = class {
     return this._value;
   }
 
-  get valueOf() {
+  valueOf() {
     return this._value;
   }
 
