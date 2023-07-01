@@ -25,11 +25,19 @@ const CreateState = class {
   }
 
   set value(value) {
-    if (typeof this._value === 'object' && !(this._value instanceof Node)) {
-      Object.keys(this._value).forEach((key) => {
-        this._value[key].value = (value[key]);
-      });
-    } else this._value = value;
+    const set = () => {
+      if (typeof this._value === 'object' && !(this._value instanceof Node)) {
+        Object.keys(this._value).forEach((key) => {
+          this._value[key].value = (value[key]);
+        });
+      } else this._value = value;
+    };
+    if (typeof this.preChange === 'function') {
+      this.preChange(value)
+        .then(() => {
+          set();
+        });
+    } else set();
   }
 
   get value() {
@@ -55,8 +63,7 @@ const CreateState = class {
     this.parent.users.add(user);
   }
 
-  async dispatch() {
-    if (typeof this.preChange === 'function') await this.preChange(this._value);
+  dispatch() {
     this.users.forEach((user) => {
       if (typeof this._value === 'object' && !(this._value instanceof Node) && !(this._value instanceof BaseComponent)) {
         Object.keys(this._value).forEach((key) => {
