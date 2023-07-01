@@ -34,7 +34,7 @@ const HandlerState = class {
 };
 const typeChecker = (item, options = {}) => {
   const handlerState = new HandlerState();
-  if (item === undefined || item == null) return;
+  if (item === undefined || item == null) return '';
   if (item instanceof CreateState) {
     handlerState.createState = item;
     const result = typeChecker(item.value);
