@@ -89,13 +89,20 @@ interface IfInterface {
 }
 export const If: IfInterface
 
+interface FullyPreparedInterface {
+  (): Promise<boolean>
+}
+
+export const fullyPrepared: FullyPreparedInterface
+
 export default {
   AmberJsx,
   BaseComponent,
   StateComponent,
   usingState,
   Await,
-  If
+  If,
+  fullyPrepared
 }
 
 
@@ -106,6 +113,7 @@ declare module 'amber' {
   usingState
   Await
   If
+  fullyPrepared
 }
 
 declare module 'react' {

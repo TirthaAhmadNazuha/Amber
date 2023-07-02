@@ -5,6 +5,7 @@ import StateComponent from './component/states';
 import Await from './buildit/await';
 import usingState from './api/usingState';
 import If from './buildit/ifEndIf';
+import fullyPrepared from './buildit/fullyPrepared';
 
 const Amber = {
   AmberJsx,
@@ -20,6 +21,7 @@ export {
   Await,
   usingState,
   If,
+  fullyPrepared,
   // eslint-disable-next-line no-restricted-exports
   Amber as default,
 };
