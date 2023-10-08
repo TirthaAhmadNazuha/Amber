@@ -75,7 +75,7 @@ interface AwaitProps {
   onReject: Element
 }
 interface AwaitInterface {
-  (props: AwaitProps): AmberJsx.createElement
+  (props: AwaitProps): import('react').JSX.Element
 }
 export const Await: AwaitInterface
 
@@ -83,11 +83,27 @@ interface IfProps {
   condition: boolean
 }
 interface IfInterface {
-  (props: IfProps): AmberJsx.createElement
-  Else: AmberJsx.createElement
+  (props: IfProps): Text
+  Else: Text
   Elif: IfInterface
 }
 export const If: IfInterface
+
+interface FormInterface {
+  (props: import('react').FromProps): import('react').JSX.Element
+}
+export const Form: FormInterface
+
+interface Ref<T> {
+  value: T
+  onChange: Function<T>
+}
+
+interface UsingRef {
+  <T>(initialValue: T extends null ? HTMLElement : T): Ref<T extends null ? HTMLElement : T>
+}
+
+export const usingRef: UsingRef
 
 export default {
   AmberJsx,
@@ -95,7 +111,9 @@ export default {
   StateComponent,
   usingState,
   Await,
-  If
+  If,
+  Form,
+  usingRef
 }
 
 
@@ -106,6 +124,8 @@ declare module 'amber' {
   usingState
   Await
   If
+  Form
+  usingRef
 }
 
 declare module 'react' {
@@ -115,8 +135,16 @@ declare module 'react' {
     onHover?(event: MouseEvent, elem: T): void
     onClick?(event: MouseEvent, elem: T): void
   }
+
+  namespace JSX {
+    interface Element extends HTMLElement {
+    }
+  }
   Await
   If
+  interface FromProps extends HTMLAttributes<HTMLFormElement> {
+    action: string | '/',
+    method: string | 'get',
+    onResponse: Function<Response>
+  }
 }
-
-

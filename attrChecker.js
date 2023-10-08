@@ -19,6 +19,12 @@ const specialAttributes = [
       });
     },
   },
+  {
+    key: 'ref',
+    val(ref, elem) {
+      ref.value = elem;
+    },
+  },
 ];
 
 const checkFrontProp = (element, key) => {
