@@ -44,7 +44,7 @@ const AmberJsx = {
           try {
             return new tag(attr, childs);
           } catch (e) {
-            throw new Error('tag is not defined');
+            throw new Error('tag in not defined');
           }
         }
       }
@@ -57,9 +57,6 @@ const AmberJsx = {
         });
       }
       return tag.create();
-    }
-    if (tag instanceof HTMLElement) {
-      return tag;
     }
 
     const param = [childs, attr];

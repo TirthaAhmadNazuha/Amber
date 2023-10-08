@@ -21,9 +21,12 @@ const CreateState = class {
     this.parent = parent;
     this.users = new Set();
     this.onChange = null;
+    this.preChange = null;
+    this.previousValue = null;
   }
 
   set value(value) {
+    this.previousValue = this._value;
     if (typeof this._value === 'object' && !(this._value instanceof Node)) {
       Object.keys(this._value).forEach((key) => {
         this._value[key].value = (value[key]);
@@ -32,6 +35,10 @@ const CreateState = class {
   }
 
   get value() {
+    return this._value;
+  }
+
+  valueOf() {
     return this._value;
   }
 
@@ -50,7 +57,8 @@ const CreateState = class {
     this.parent.users.add(user);
   }
 
-  dispatch() {
+  async dispatch() {
+    if (typeof this.preChange === 'function') await this.preChange(this.previousValue);
     this.users.forEach((user) => {
       if (typeof this._value === 'object' && !(this._value instanceof Node) && !(this._value instanceof BaseComponent)) {
         Object.keys(this._value).forEach((key) => {

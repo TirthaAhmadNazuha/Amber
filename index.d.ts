@@ -105,6 +105,12 @@ interface UsingRef {
 
 export const usingRef: UsingRef
 
+interface FullyPreparedInterface {
+  (): Promise<boolean>
+}
+
+export const fullyPrepared: FullyPreparedInterface
+
 export default {
   AmberJsx,
   BaseComponent,
@@ -113,6 +119,7 @@ export default {
   Await,
   If,
   Form,
+  fullyPrepared,
   usingRef
 }
 
@@ -125,6 +132,7 @@ declare module 'amber' {
   Await
   If
   Form
+  fullyPrepared
   usingRef
 }
 
@@ -147,4 +155,5 @@ declare module 'react' {
     method: string | 'get',
     onResponse: Function<Response>
   }
+  Form
 }

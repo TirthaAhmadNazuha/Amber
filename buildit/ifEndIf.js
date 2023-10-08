@@ -1,5 +1,5 @@
 import BaseComponent from '../component/base';
-import typeChecker, { isIterable } from '../typeChecker';
+import { isIterable } from '../typeChecker';
 
 const IfClasses = class extends BaseComponent {
   Else(_, childs) {
@@ -28,7 +28,7 @@ const IfClasses = class extends BaseComponent {
           output.push(c);
         }
       });
-      return typeChecker(output);
+      return output;
     }
     const elifs = [];
     let findedElseConditions = null;
@@ -47,7 +47,7 @@ const IfClasses = class extends BaseComponent {
     if (findedElseConditions != null) {
       return findedElseConditions;
     }
-    return new Text('');
+    return new Text('ini false');
   }
 };
 
