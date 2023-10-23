@@ -41,11 +41,7 @@ const AmberJsx = {
         try {
           return tag(attr, childs);
         } catch (_) {
-          try {
-            return new tag(attr, childs);
-          } catch (e) {
-            throw new Error('tag in not defined');
-          }
+          return new tag(attr, childs);
         }
       }
     }
