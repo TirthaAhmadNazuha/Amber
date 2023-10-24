@@ -1,45 +1,33 @@
+import { BaseComponent, fullyPrepared } from '..';
 import AmberJsx from '../amberJsx';
 
-function Form(props, childs) {
-  const elem = AmberJsx.createElement('form-amber', props, childs);
-  const { action, method, headers } = {
-    action: props?.action || '/',
-    headers: props?.headers,
-    method: (props?.method || 'get').toLowerCase(),
-  };
+class Form extends BaseComponent {
+  render() {
+    return AmberJsx.createElement('form-amber', this.props, this.childs);
+  }
 
-  const HandlerSubmit = async () => {
-    const data = {};
-    childs.forEach((child) => {
-      if (child?.name?.length > 0) {
-        data[child.name] = child.type === 'number' ? Number(child.value) : child.value;
+  async onConnected() {
+    const HandlerSubmit = async () => {
+      const { method, headers, action } = this.props;
+      const data = {};
+      this.element.querySelectorAll('input').forEach((child) => {
+        if (child?.name?.length > 0) {
+          data[child.name] = child.type === 'number' ? Number(child.value) : child.value;
+        }
+      });
+      let res = null;
+      if (method === 'get') {
+        const querys = Object.keys(data).map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`).join('&');
+        res = await fetch(`${action}?${querys}}`, { method, headers });
+      } else {
+        res = await fetch(action, { method, headers, body: JSON.stringify(data) });
       }
-    });
-    let res = null;
-    if (method === 'get') {
-      const querys = Object.keys(data).map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`).join('&');
-      res = await fetch(`${action}?${querys}}`, { method, headers });
-    } else {
-      res = await fetch(action, { method, headers, body: JSON.stringify(data) });
-    }
-    if (typeof props?.onResponse === 'function') props.onResponse(res);
-  };
+      if (typeof this.props?.onResponse === 'function') this.props.onResponse(res);
+    };
+    await fullyPrepared();
 
-  childs.forEach((child) => {
-    // eslint-disable-next-line default-case
-    switch (child.tagName.toLowerCase()) {
-      case 'button':
-        child.addEventListener('click', () => {
-          HandlerSubmit();
-        });
-        break;
-      case 'input':
-        child.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') HandlerSubmit();
-        });
-    }
-  });
-  return elem;
+    this.element.querySelector('button[type="submit"]').addEventListener('click', HandlerSubmit);
+  }
 }
 
 export default Form;

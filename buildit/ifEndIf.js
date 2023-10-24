@@ -47,7 +47,7 @@ const IfClasses = class extends BaseComponent {
     if (findedElseConditions != null) {
       return findedElseConditions;
     }
-    return new Text('ini false');
+    return new Text('');
   }
 };
 
