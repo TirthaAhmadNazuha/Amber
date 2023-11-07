@@ -48,7 +48,7 @@ const typeChecker = (item) => {
     return item.create();
   }
   if (item instanceof Array) {
-    return item.map(typeChecker);
+    return [].concat(...item).map(typeChecker);
   }
   if (typeof item === 'string' || typeof item === 'number') {
     return new Text(item);
@@ -71,7 +71,7 @@ const typeChecker = (item) => {
         return typeChecker(ch);
       });
 
-      pendingElement.replaceWith(...childResult);
+      pendingElement.replaceWith(...[].concat(...childResult));
     })
       .catch((err) => {
         if (rejectElement) {
