@@ -79,16 +79,6 @@ interface AwaitInterface {
 }
 export const Await: AwaitInterface
 
-interface IfProps {
-  condition: boolean
-}
-interface IfInterface {
-  (props: IfProps): Text
-  Else: Text
-  Elif: IfInterface
-}
-export const If: IfInterface
-
 interface FormInterface {
   (props: import('react').FromProps): import('react').JSX.Element
 }
@@ -96,7 +86,7 @@ export const Form: FormInterface
 
 interface Ref<T> {
   value: T
-  onChange: Function<T>
+  onChange(value: T): void
 }
 
 interface UsingRef {
@@ -117,7 +107,6 @@ export default {
   StateComponent,
   usingState,
   Await,
-  If,
   Form,
   fullyPrepared,
   usingRef
@@ -130,7 +119,6 @@ declare module 'amber' {
   StateComponent
   usingState
   Await
-  If
   Form
   fullyPrepared
   usingRef
@@ -149,11 +137,11 @@ declare module 'react' {
     }
   }
   Await
-  If
   interface FromProps extends HTMLAttributes<HTMLFormElement> {
     action: string | '/',
     method: string | 'get',
-    onResponse: Function<Response>
+    onResponse(response: Response): void,
+    mapData?(data: { [field: string]: string }): { [field: string]: string }
   }
   Form
 }

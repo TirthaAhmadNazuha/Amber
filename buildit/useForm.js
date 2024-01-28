@@ -8,13 +8,18 @@ class Form extends BaseComponent {
 
   async onConnected() {
     const HandlerSubmit = async () => {
-      const { method, headers, action } = this.props;
-      const data = {};
+      const {
+        method, headers, action, mapData,
+      } = this.props;
+      let data = {};
       this.element.querySelectorAll('input').forEach((child) => {
         if (child?.name?.length > 0) {
           data[child.name] = child.type === 'number' ? Number(child.value) : child.value;
         }
       });
+      if (typeof mapData === 'function') {
+        data = await mapData(data);
+      }
       let res = null;
       if (method === 'get') {
         const querys = Object.keys(data).map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`).join('&');

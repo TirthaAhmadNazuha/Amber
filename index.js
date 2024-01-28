@@ -4,7 +4,6 @@ import BaseComponent from './component/base';
 import StateComponent from './component/states';
 import Await from './buildit/await';
 import usingState from './api/usingState';
-import If from './buildit/ifEndIf';
 import Form from './buildit/useForm';
 import usingRef from './api/usingRef';
 import fullyPrepared from './buildit/fullyPrepared';
@@ -22,7 +21,6 @@ export {
   AmberJsx,
   Await,
   usingState,
-  If,
   Form,
   usingRef,
   fullyPrepared,

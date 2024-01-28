@@ -28,7 +28,7 @@ const specialAttributes = [
 ];
 
 const checkFrontProp = (element, key) => {
-  if (element[key] !== undefined) return false;
+  if (element[key]) return true;
   return true;
 };
 
