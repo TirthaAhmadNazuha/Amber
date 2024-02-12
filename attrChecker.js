@@ -25,11 +25,25 @@ const specialAttributes = [
       ref.value = elem;
     },
   },
+  {
+    key: 'data',
+    val(val, elem) {
+      try {
+        if (elem.data === undefined) elem.data = {};
+        Object.keys(val).forEach((key) => {
+          elem.data[key] = val[key];
+        });
+      } catch (_) {
+        console.error('dataset must object value!');
+      }
+    },
+  },
 ];
 
 const checkFrontProp = (element, key) => {
+  if (element.localName.endsWith('-amber')) return false;
   if (element[key] === undefined) return true;
-  return true;
+  return false;
 };
 
 export const remakeArray = (arr) => {

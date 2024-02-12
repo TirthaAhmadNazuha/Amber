@@ -11,6 +11,9 @@ class Form extends BaseComponent {
       const {
         method, headers, action, mapData,
       } = this.props;
+      if (action === undefined) {
+        throw new Error('Action is required prop');
+      }
       let data = {};
       this.element.querySelectorAll('input').forEach((child) => {
         if (child?.name?.length > 0) {
@@ -31,7 +34,12 @@ class Form extends BaseComponent {
     };
     await fullyPrepared();
 
-    this.element.querySelector('button[type="submit"]').addEventListener('click', HandlerSubmit);
+    this.element.querySelectorAll('input').forEach((inp) => {
+      inp.addEventListener('keyup', (e) => {
+        if (e.keyCode === 13) HandlerSubmit();
+      });
+    });
+    this.element.querySelector('button[type="submit"]')?.addEventListener('click', HandlerSubmit);
   }
 }
 
