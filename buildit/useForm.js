@@ -8,6 +8,9 @@ class Form extends BaseComponent {
 
   async onConnected() {
     const HandlerSubmit = async () => {
+      if (!(this.props.headers instanceof Object)) {
+        this.props.headers = {};
+      }
       const {
         method, headers, action, mapData,
       } = this.props;
@@ -28,6 +31,9 @@ class Form extends BaseComponent {
         const querys = Object.keys(data).map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`).join('&');
         res = await fetch(`${action}?${querys}}`, { method, headers });
       } else {
+        if (!headers['Content-Type']) {
+          headers['Content-Type'] = 'application/json';
+        }
         res = await fetch(action, { method, headers, body: JSON.stringify(data) });
       }
       if (typeof this.props?.onResponse === 'function') this.props.onResponse(res);
