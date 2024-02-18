@@ -11,8 +11,11 @@ class Form extends BaseComponent {
       if (!(this.props.headers instanceof Object)) {
         this.props.headers = {};
       }
+      if (!(this.props.requestInit instanceof Object)) {
+        this.props.requestInit = {};
+      }
       const {
-        method, headers, action, mapData,
+        method, headers, action, mapData, requestInit,
       } = this.props;
       if (action === undefined) {
         throw new Error('Action is required prop');
@@ -29,12 +32,14 @@ class Form extends BaseComponent {
       let res = null;
       if (method === 'get') {
         const querys = Object.keys(data).map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`).join('&');
-        res = await fetch(`${action}?${querys}}`, { method, headers });
+        res = await fetch(`${action}?${querys}}`, { method, headers, ...requestInit });
       } else {
         if (!headers['Content-Type']) {
           headers['Content-Type'] = 'application/json';
         }
-        res = await fetch(action, { method, headers, body: JSON.stringify(data) });
+        res = await fetch(action, {
+          method, headers, body: JSON.stringify(data), ...requestInit,
+        });
       }
       if (typeof this.props?.onResponse === 'function') this.props.onResponse(res);
     };

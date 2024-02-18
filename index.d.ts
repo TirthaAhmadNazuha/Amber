@@ -140,6 +140,7 @@ declare module 'react' {
   interface FromProps extends HTMLAttributes<HTMLFormElement> {
     action: string | '/',
     method: string | 'get',
+    requestInit: RequestInit
     onResponse(response: Response): void,
     mapData?(data: { [field: string]: string }): { [field: string]: string }
   }
