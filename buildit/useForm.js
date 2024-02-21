@@ -21,7 +21,7 @@ class Form extends BaseComponent {
         throw new Error('Action is required prop');
       }
       let data = {};
-      this.element.querySelectorAll('input').forEach((child) => {
+      this.element.querySelectorAll('input, textarea, select, button').forEach((child) => {
         if (child?.name?.length > 0) {
           data[child.name] = child.type === 'number' ? Number(child.value) : child.value;
         }
