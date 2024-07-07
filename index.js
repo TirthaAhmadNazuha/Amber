@@ -7,6 +7,7 @@ import usingState from './api/usingState';
 import Form from './buildit/useForm';
 import usingRef from './api/usingRef';
 import fullyPrepared from './buildit/fullyPrepared';
+import { defineRoot, onConnectedCallback } from './mutation'
 
 const Amber = {
   AmberJsx,
@@ -24,6 +25,8 @@ export {
   Form,
   usingRef,
   fullyPrepared,
+  defineRoot,
+  onConnectedCallback,
   // eslint-disable-next-line no-restricted-exports
   Amber as default,
 };

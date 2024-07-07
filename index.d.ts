@@ -99,6 +99,23 @@ interface FullyPreparedInterface {
   (): Promise<boolean>
 }
 
+interface defineRootInterface {
+  /**
+   * Make method BaseComponent.onConnected() working.
+   */
+  (rootElement: HTMLElement): void
+}
+export const defineRoot: defineRootInterface
+
+interface onConnectedCallbackFunctionInterface {
+  (element: (HTMLElement | JSX.Element | Element | Node)): void
+}
+interface onConnectedCallbackInterface {
+  (element: (HTMLElement | JSX.Element | Element | Node), callback: onConnectedCallbackFunctionInterface): void
+}
+
+export const onConnectedCallback: onConnectedCallbackInterface
+
 export const fullyPrepared: FullyPreparedInterface
 
 export default {
@@ -109,7 +126,9 @@ export default {
   Await,
   Form,
   fullyPrepared,
-  usingRef
+  usingRef,
+  defineRoot,
+  onConnectedCallback,
 }
 
 
@@ -122,6 +141,8 @@ declare module 'amber' {
   Form
   fullyPrepared
   usingRef
+  defineRoot
+  onConnectedCallback
 }
 
 declare module 'react' {

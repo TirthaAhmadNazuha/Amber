@@ -1,4 +1,5 @@
 import { isIterable } from '../typeChecker';
+import { onConnectedCallback } from '../mutation'
 
 const BaseComponent = class {
   constructor(props, childs) {
@@ -16,31 +17,31 @@ const BaseComponent = class {
   processJSX() {
     this.element = this.render();
   }
-
   onConnected() { }
 
   create() {
     const elem = this.element || this.render();
-    if (isIterable(elem)) {
-      const textForGettingParent = new Text();
-      textForGettingParent.isElementFragment = elem;
-      const DOMNodeInserted = () => {
-        this.parent = textForGettingParent.parentElement;
-        textForGettingParent.replaceWith(...elem);
-        this.element = elem;
-        this.onConnected();
-        textForGettingParent.removeEventListener('DOMNodeInserted', DOMNodeInserted);
-      };
-      textForGettingParent.addEventListener('DOMNodeInserted', DOMNodeInserted);
-      return textForGettingParent;
+    if (typeof this.onConnected == 'function') {
+      if (isIterable(elem)) {
+        const textForGettingPosition = new Text();
+        textForGettingPosition.isElementFragment = elem;
+        const DOMNodeInserted = () => {
+          this.parent = textForGettingPosition.parentElement;
+          textForGettingPosition.replaceWith(...elem);
+          this.element = elem;
+          this.onConnected();
+        };
+        onConnectedCallback(textForGettingPosition, DOMNodeInserted)
+        console.log('return', textForGettingPosition)
+        return textForGettingPosition;
+      }
+      onConnectedCallback(elem, (elem) => {
+        this.parent = elem.parentElement
+        this.element = elem
+        this.onConnected()
+      })
+
     }
-    const Inserted = () => {
-      this.parent = elem.parentElement;
-      this.element = elem;
-      this.onConnected();
-      this.element.removeEventListener('DOMNodeInserted', Inserted);
-    };
-    elem.addEventListener('DOMNodeInserted', Inserted);
     return elem;
   }
 };

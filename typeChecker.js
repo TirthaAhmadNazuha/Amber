@@ -13,33 +13,12 @@ export const isIterable = (any) => {
   }
 };
 
-const HandlerState = class {
-  constructor() {
-    this.users = [];
-    this.createState = null;
-    setTimeout(() => {
-      if (this.createState == null) return;
-      this.subcribing();
-    }, 50);
-  }
-
-  add(node) {
-    if (this.users.find((n) => n === node)) return;
-    this.users.push(node);
-  }
-
-  subcribing() {
-    this.createState.subcribe(this.users, 'children');
-  }
-};
 const typeChecker = (item) => {
-  const handlerState = new HandlerState();
   if (item === undefined || item == null) return '';
   if (item instanceof CreateState) {
-    handlerState.createState = item;
-    const result = typeChecker(item.value);
-    handlerState.add(result);
-    return result;
+    const result = typeChecker(item.value)
+    item.subcribe(isIterable(result) ? result : [result], 'children')
+    return result
   }
   if (item instanceof Node) {
     return item;
