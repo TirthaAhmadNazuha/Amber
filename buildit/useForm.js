@@ -6,6 +6,29 @@ class Form extends BaseComponent {
     return AmberJsx.createElement('form-amber', this.props, this.childs);
   }
 
+  /**
+   * 
+   * @param {File} file 
+   */
+  static async fileToBase64(file) {
+    const res = {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      lastModified: file.lastModified,
+      base64: ''
+    }
+    const reader = new FileReader()
+    res.base64 = await new Promise((resolve, reject) => {
+      reader.onloadend = () => resolve(reader.result)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+    res.base64 = res.base64.split('base64,', 2)[1]
+    console.log(res.base64)
+    return res
+  }
+
   async onConnected() {
     const HandlerSubmit = async () => {
       if (!(this.props.headers instanceof Object)) {
@@ -21,11 +44,15 @@ class Form extends BaseComponent {
         throw new Error('Action is required prop');
       }
       let data = {};
-      this.element.querySelectorAll('input, textarea, select, button').forEach((child) => {
+      for (const child of this.element.querySelectorAll('input, textarea, select, button')) {
         if (child?.name?.length > 0) {
-          data[child.name] = child.type === 'number' ? Number(child.value) : child.value;
+          if (child.type == 'file') {
+            data[child.name] = await Promise.all(Array.from(child.files).map(Form.fileToBase64))
+          } else {
+            data[child.name] = child.type === 'number' ? Number(child.value) : child.value;
+          }
         }
-      });
+      }
       if (typeof mapData === 'function') {
         data = await mapData(data);
       }

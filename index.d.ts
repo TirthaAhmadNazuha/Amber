@@ -118,6 +118,17 @@ export const onConnectedCallback: onConnectedCallbackInterface
 
 export const fullyPrepared: FullyPreparedInterface
 
+interface IfStateProps {
+  when: CreateState<Boolean>
+  ifTrue: HTMLElement | CreateState<HTMLElement> | import('react').JSX.Element
+  ifElse: HTMLElement | CreateState<HTMLElement> | import('react').JSX.Element
+}
+interface IfStateInterface {
+  (props: IfStateProps): CreateState<HTMLElement | CreateState<HTMLElement> | import('react').JSX.Element>
+}
+
+export const IfState: IfStateInterface
+
 export default {
   AmberJsx,
   BaseComponent,
@@ -129,6 +140,7 @@ export default {
   usingRef,
   defineRoot,
   onConnectedCallback,
+  IfState,
 }
 
 
@@ -143,6 +155,7 @@ declare module 'amber' {
   usingRef
   defineRoot
   onConnectedCallback
+  IfState
 }
 
 declare module 'react' {
@@ -166,4 +179,5 @@ declare module 'react' {
     mapData?(data: { [field: string]: string }): { [field: string]: string }
   }
   Form
+  IfState
 }
