@@ -34,9 +34,9 @@ const typeChecker = (item) => {
   }
   if (typeof item === 'function') {
     if (Function.prototype.toString.call(item).startsWith('class')) {
-      if (item.prototype instanceof BaseComponent) {
+      if (item.prototype.create) {
         return new item().create()
-      } else throw new TypeError('JSX Element type class must instanceof BaseComponent')
+      } else throw new TypeError('JSX Element type class must have create method and return element html')
     } else {
       return item()
     }

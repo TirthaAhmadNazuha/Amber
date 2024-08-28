@@ -33,9 +33,9 @@ const AmberJsx = {
   createElement(tag, attr, ...childs) {
     if (typeof tag === 'function') {
       if (Function.prototype.toString.call(tag).startsWith('class')) {
-        if (tag.prototype instanceof BaseComponent) {
+        if (tag.prototype.create) {
           return new tag(attr, childs).create()
-        } else throw new TypeError('JSX Element type class must instanceof BaseComponent')
+        } else throw new TypeError('JSX Element type class must have create method and return element html')
       } else {
         if (tag?.name === 'Fragment') {
           return tag(childs)
