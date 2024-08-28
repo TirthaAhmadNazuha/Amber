@@ -1,77 +1,79 @@
 /* eslint-disable consistent-return */
-import { BaseComponent } from '.';
-import CreateState from './api/createState';
+import { BaseComponent } from '.'
+import CreateState from './api/createState'
 
 export const isIterable = (any) => {
-  if (any === undefined || any == null) return false;
+  if (any === undefined || any == null) return false
 
   try {
-    if (typeof any[Symbol.iterator] === 'function') return true;
-    return false;
+    if (typeof any[Symbol.iterator] === 'function') return true
+    return false
   } catch (_) {
-    return false;
+    return false
   }
-};
+}
 
 const typeChecker = (item) => {
-  if (item === undefined || item == null) return '';
+  if (item === undefined || item == null) return ''
   if (item instanceof CreateState) {
     const result = typeChecker(item.value)
     item.subcribe(isIterable(result) ? result : [result], 'children')
     return result
   }
   if (item instanceof Node) {
-    return item;
+    return item
   }
   if (item instanceof BaseComponent) {
-    return item.create();
+    return item.create()
   }
   if (item instanceof Array) {
-    return [].concat(...item).map(typeChecker);
+    return [].concat(...item).map(typeChecker)
   }
   if (typeof item === 'string' || typeof item === 'number') {
-    return new Text(item);
+    return new Text(item)
   }
   if (typeof item === 'function') {
-    try {
-      return typeChecker(item());
-    } catch (_) {
-      return new item().create();
+    if (Function.prototype.toString.call(item).startsWith('class')) {
+      if (item.prototype instanceof BaseComponent) {
+        return new item().create()
+      } else throw new TypeError('JSX Element type class must instanceof BaseComponent')
+    } else {
+      return item()
     }
   }
   if (item instanceof Promise) {
-    const pendingElement = typeChecker(item?.onPending) || new Text('');
-    const rejectElement = typeChecker(item?.onReject);
+    const pendingElement = typeChecker(item?.onPending) || new Text('')
+    const rejectElement = typeChecker(item?.onReject)
     item.then((response) => {
       const childResult = item.childs.map((ch) => {
         if (typeof ch === 'function') {
-          return typeChecker(ch(response));
+          return typeChecker(ch(response))
         }
-        return typeChecker(ch);
-      });
+        return typeChecker(ch)
+      })
 
-      pendingElement.replaceWith(...[].concat(...childResult));
+      pendingElement.replaceWith(...[].concat(...childResult))
     })
       .catch((err) => {
         if (rejectElement) {
           pendingElement
-            .replaceWith(...(isIterable(rejectElement) ? rejectElement : [rejectElement]));
+            .replaceWith(...(isIterable(rejectElement) ? rejectElement : [rejectElement]))
         }
-        throw new Error(err);
-      });
-    return pendingElement;
+        throw new Error(err)
+      })
+    return pendingElement
   }
   if (isIterable(item)) {
-    const result = new Set();
+    const result = new Set()
     item.forEach((val) => {
-      result.add(typeChecker(val));
-    });
-    return result;
+      result.add(typeChecker(val))
+    })
+    return result
   }
   if (typeof item === 'boolean') {
-    return '';
+    return ''
   }
-  throw new Error('typeChecker can not find type!');
-};
+  throw new Error('typeChecker can not find type!')
+}
 
-export default typeChecker;
+export default typeChecker
